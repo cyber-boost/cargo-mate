@@ -1,0 +1,5 @@
+auto_increment = true
+version_file = ".version"
+current_version = "1.0.6"
+increment_policy = "Patch"
+version_format = "Semantic"

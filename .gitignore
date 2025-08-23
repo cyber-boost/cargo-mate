@@ -1,0 +1,29 @@
+# Rust build artifacts
+target/
+Cargo.lock
+**/*.rs.bk
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+
+# Node modules (if any)
+node_modules/
+
+# Backup files
+*.backup
+*.bak
+
+# Environment files
+.env

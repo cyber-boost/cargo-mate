@@ -1,0 +1,55 @@
+[package]
+name = "cargo-mate"
+version = "1.0.6"
+edition = "2021"
+authors = ["Cargo Mate <mate@cargo.do>"]
+description = "Rust development companion that enhances cargo with intelligent workflows, state management, performance optimization, and comprehensive project monitoring"
+license = "BBL"
+readme = "README.md"
+homepage = "https://github.com/cyber-boost/cargo-mate"
+repository = "https://github.com/cyber-boost/cargo-mate"
+keywords = ["cargo", "rust", "development", "cli", "productivity", "build", "optimization"]
+categories = ["development-tools", "command-line-utilities"]
+exclude = ["target/"]
+
+# Include all the wrapper scripts and protected binaries
+include = [
+    "README.md",
+    "sh/install.sh",
+    "sh/wrapper-linux.sh",
+    "sh/wrapper-macos.sh",
+    "sh/wrapper-windows.bat",
+    "sh/wrapper-windows.ps1",
+    "linux/cargo-mate-linux-x86_64.protected",
+    "linux/cargo-mate-linux-aarch64.protected",
+    "macos/cargo-mate-macos-x86_64.protected",
+    "macos/cargo-mate-macos-aarch64.protected",
+    "windows/cargo-mate-windows-x86_64.exe.protected",
+]
+
+[lib]
+# This is primarily a binary package, but we include a lib for documentation
+name = "cargo_mate"
+path = "src/lib.rs"
+
+# Binary targets for the wrapper scripts
+[[bin]]
+name = "cm"
+path = "src/main.rs"
+
+# Metadata for crates.io
+[package.metadata]
+supported-platforms = ["linux-x86_64", "linux-aarch64", "macos-x86_64", "macos-aarch64", "windows-x86_64"]
+
+[dependencies]
+# Minimal dependencies for the installer
+anyhow = "1.0"
+dirs = "5.0"
+tempfile = "3.0"
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
