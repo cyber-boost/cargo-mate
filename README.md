@@ -30,7 +30,8 @@ A powerful Rust development companion that enhances cargo with intelligent workf
 - [🎯 Examples](#-examples)
 - [📄 License](#-license)
 
-## 📚 Command Reference
+## 📚 MOST IMPORANT : AFTER INSTALL RUN 
+cm install && cm activate 
 
 ### Journey Commands
 ```bash
