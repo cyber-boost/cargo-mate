@@ -25,9 +25,18 @@ else
     true
 fi
 
-# Detect architecture
+# Detect architecture and find protected binary
 detect_arch() {
     local arch=$(uname -m)
+    
+    # First try to find the binary in .shipwreck/bin (new structure)
+    local shipwreck_bin="$HOME/.shipwreck/bin/cargo-mate-protected"
+    if [[ -f "$shipwreck_bin" ]]; then
+        PROTECTED_BINARY="$shipwreck_bin"
+        return 0
+    fi
+    
+    # Fallback to old structure (for development/testing)
     case $arch in
         x86_64|amd64)
             PROTECTED_BINARY="$SCRIPT_DIR/linux/cargo-mate-linux-x86_64.protected"
