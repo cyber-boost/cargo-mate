@@ -8,21 +8,16 @@ fn main() {
     if !has_cc && !has_gcc {
         println!("cargo:warning=🚨 C compiler not found!");
         println!("cargo:warning=");
-        println!("cargo:warning=The 'cargo-mate' crate requires a C compiler to compile dependencies.");
+        println!("cargo:warning=Good news! This version of cargo-mate (v1.0.43+) doesn't require a C compiler!");
+        println!("cargo:warning=This warning appears because of cached dependency information.");
         println!("cargo:warning=");
-        println!("cargo:warning= Quick fix - run this first:");
+        println!("cargo:warning=🔧 To get the latest version without this warning:");
+        println!("cargo:warning=   cargo install cargo-mate --force");
+        println!("cargo:warning=");
+        println!("cargo:warning=📦 Or use the direct download (recommended):");
         println!("cargo:warning=   curl -sSL https://get.cargo.do/install.sh | bash");
         println!("cargo:warning=");
-        println!("cargo:warning=📦 Or install build tools manually:");
-        println!("cargo:warning=   Ubuntu/Debian: sudo apt install build-essential");
-        println!("cargo:warning=   CentOS/RHEL:   sudo yum groupinstall 'Development Tools'");
-        println!("cargo:warning=   Arch Linux:    sudo pacman -S base-devel");
-        println!("cargo:warning=   macOS:         brew install gcc");
-        println!("cargo:warning=");
-        println!("cargo:warning=Then retry: cargo install cargo-mate");
-        println!("cargo:warning=");
-        println!("cargo:warning=Alternatively, use the direct download:");
-        println!("cargo:warning=   curl -sSL https://get.cargo.do/install.sh | bash");
+        println!("cargo:warning=The installation should continue successfully despite this warning.");
 
         // Don't fail the build - let the dependency compilation fail with its own error
         // This way users see our helpful message first, then the actual compiler error

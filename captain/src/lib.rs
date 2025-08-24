@@ -17,7 +17,8 @@
 //!
 
 
-pub use anyhow::{Result, anyhow};
+// Simple error handling without external dependencies
+pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 /// Get the version of cargo-mate
 pub fn version() -> &'static str {

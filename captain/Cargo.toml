@@ -1,10 +1,10 @@
 [package]
 name = "cargo-mate"
-version = "1.0.35"
+version = "1.0.64"
 edition = "2021"
 rust-version = "1.70"
 authors = ["Cargo Mate <mate@cargo.do>"]
-description = "Rust development companion that enhances cargo with intelligent workflows, state management, performance optimization, and comprehensive project monitoring"
+description = "Rust development companion that enhances cargo with intelligent workflows, state management, performance optimization, and comprehensive project monitoring. Pure binary package - no C compiler required!"
 documentation = "https://cargo.do/docs"  
 homepage = "https://cargo.do"
 repository = "https://github.com/cyber-boost/cargo-mate"
@@ -26,12 +26,11 @@ include = [
     "sh/wrapper-windows.bat",
     "sh/wrapper-windows.ps1",
     "cmd.md",
-    "src/",
-    "build.rs",
+    "src/main.rs",
     "Cargo.toml",
 ]
 
-# Exclude large binary files and build artifacts
+# Exclude backup files and other non-essential files
 exclude = [
     "target/",
     "linux/",
@@ -39,14 +38,13 @@ exclude = [
     "windows/",
     "*.protected",
     "*.exe",
+    "*.backup",
 ]
 
-[lib]
-# This is primarily a binary package, but we include a lib for documentation
-name = "cargo_mate"
-path = "src/lib.rs"
+# Removed library target - this is purely a binary package
+# Library functionality removed to eliminate any potential C compiler dependencies
 
-# Binary targets for the wrapper scripts
+# Binary target for cargo-mate
 [[bin]]
 name = "cm"
 path = "src/main.rs"
@@ -55,17 +53,18 @@ path = "src/main.rs"
 [package.metadata]
 supported-platforms = ["linux-x86_64", "linux-aarch64", "macos-x86_64", "macos-aarch64", "windows-x86_64"]
 
+# Important: This crate has NO system dependencies - no C compiler required!
+[package.metadata.system-dependencies]
+# Empty section confirms no system dependencies
+note = "This crate compiles with zero system dependencies"
+
 [badges]
 maintenance = { status = "actively-developed" }  # or "passively-maintained", "as-is", "experimental", "looking-for-maintainer", "deprecated", "none"
 
 [dependencies]
-# Minimal dependencies for the installer
-anyhow = "1.0"
-dirs = "5.0"
+# Minimal dependencies that don't require C compilation
+# Using simple error handling to avoid C compiler requirement
+# No external crates that require C compilation
 
 [profile.release]
-opt-level = "s"
-lto = true
-codegen-units = 1
-panic = "abort"
-strip = true
+opt-level = 3

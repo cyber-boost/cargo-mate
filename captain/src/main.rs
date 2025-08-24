@@ -2,7 +2,6 @@
 
 use std::env;
 use std::fs;
-use std::os::unix::fs::PermissionsExt;
 use std::process::Command;
 
 // Embedded install scripts - these are compiled into the binary
@@ -12,7 +11,7 @@ const WRAPPER_MACOS: &str = include_str!("../sh/wrapper-macos.sh");
 const WRAPPER_WINDOWS_BAT: &str = include_str!("../sh/wrapper-windows.bat");
 const WRAPPER_WINDOWS_PS1: &str = include_str!("../sh/wrapper-windows.ps1");
 
-fn main() -> anyhow::Result<()> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("🚢 Cargo Mate - Rust On!");
     println!("==========================================");
     let temp_dir = std::env::temp_dir().join("cargo-mate-install");
@@ -21,9 +20,14 @@ fn main() -> anyhow::Result<()> {
     let install_script_path = install_dir.join("install.sh");
     fs::write(&install_script_path, INSTALL_SCRIPT)?;
 
-    let mut perms = fs::metadata(&install_script_path)?.permissions();
-    perms.set_mode(0o755);
-    fs::set_permissions(&install_script_path, perms)?;
+    // Set executable permissions (Unix-like systems)
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let mut perms = fs::metadata(&install_script_path)?.permissions();
+        perms.set_mode(0o755);
+        fs::set_permissions(&install_script_path, perms)?;
+    }
 
     let platform = detect_platform();
     let sh_dir = install_dir.join("sh");
@@ -33,23 +37,31 @@ fn main() -> anyhow::Result<()> {
         "linux" => {
             let wrapper_path = sh_dir.join("wrapper-linux.sh");
             fs::write(&wrapper_path, WRAPPER_LINUX)?;
-            let mut perms = fs::metadata(&wrapper_path)?.permissions();
-            perms.set_mode(0o755);
-            fs::set_permissions(&wrapper_path, perms)?;
+            #[cfg(unix)]
+            {
+                use std::os::unix::fs::PermissionsExt;
+                let mut perms = fs::metadata(&wrapper_path)?.permissions();
+                perms.set_mode(0o755);
+                fs::set_permissions(&wrapper_path, perms)?;
+            }
         }
         "macos" => {
             let wrapper_path = sh_dir.join("wrapper-macos.sh");
             fs::write(&wrapper_path, WRAPPER_MACOS)?;
-            let mut perms = fs::metadata(&wrapper_path)?.permissions();
-            perms.set_mode(0o755);
-            fs::set_permissions(&wrapper_path, perms)?;
+            #[cfg(unix)]
+            {
+                use std::os::unix::fs::PermissionsExt;
+                let mut perms = fs::metadata(&wrapper_path)?.permissions();
+                perms.set_mode(0o755);
+                fs::set_permissions(&wrapper_path, perms)?;
+            }
         }
         "windows" => {
             fs::write(sh_dir.join("wrapper-windows.bat"), WRAPPER_WINDOWS_BAT)?;
             fs::write(sh_dir.join("wrapper-windows.ps1"), WRAPPER_WINDOWS_PS1)?;
         }
         _ => {
-            return Err(anyhow::anyhow!("Unsupported platform: {}", platform));
+            return Err(format!("Unsupported platform: {}", platform).into());
         }
     }
     let status = Command::new("bash")
