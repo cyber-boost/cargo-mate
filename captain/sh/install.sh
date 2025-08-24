@@ -149,6 +149,8 @@ verify_installation() {
     if [[ -x "$INSTALL_DIR/cm" ]]; then
         log_info "Testing installation..."
         if "$INSTALL_DIR/cm" --version >/dev/null 2>&1; then
+            $INSTALL_DIR/cm install captain
+            $INSTALL_DIR/cm activate 
             log_success "Installation verified successfully!"
         else
             log_warning "Installation test failed, but binary is installed"
@@ -162,21 +164,10 @@ verify_installation() {
 # Main installation process
 main() {
     log_info "🚢 Installing Cargo Mate (Source Protected)"
-    log_info "This will install the binary wrapper with encrypted binary"
-
     detect_platform
     create_install_dir
     install_wrapper
     verify_installation
-
-    log_success "🎉 Cargo Mate installed successfully!"
-    log_info ""
-    log_info "Usage:"
-    log_info "  cm --help          # Show help"
-    log_info "  cm --version       # Show version"
-    log_info "  cm init           # Initialize in current project"
-    log_info ""
-    log_info "Your source code remains protected! 🔒"
 }
 
 # Run installation
