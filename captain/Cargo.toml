@@ -1,6 +1,6 @@
 [package]
 name = "cargo-mate"
-version = "1.0.6"
+version = "1.0.9"
 edition = "2021"
 rust-version = "1.70"
 authors = ["Cargo Mate <mate@cargo.do>"]
@@ -8,7 +8,7 @@ description = "Rust development companion that enhances cargo with intelligent w
 documentation = "https://cargo.do/docs"  
 homepage = "https://cargo.do"
 repository = "https://github.com/cyber-boost/cargo-mate"
-license = "BBL"
+license = "MIT"
 readme = "README.md"
 keywords = ["cargo", "cli", "build", "development", "optimization"]  
 categories = ["development-tools", "command-line-utilities", "configuration", "rust-patterns"]  
