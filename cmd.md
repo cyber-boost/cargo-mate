@@ -1,4 +1,5 @@
 # Cargo Mate (cm)
+Run cm install && cm activate > then cm can run cargo and cargo can run cm 
 
 ## CM Commands
 cm --help
