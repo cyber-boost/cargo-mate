@@ -1,7 +1,4 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/cyber-boost/cargo-mate/main/logo.svg" alt="Cargo Mate Logo" width="400"/>
-</p>
-A powerful Rust development companion that enhances cargo with intelligent workflows, state management, performance optimization, and comprehensive project monitoring.
+Cargo Mate: a Rust development companion that enhances cargo with intelligent workflows, state management, performance optimization, and comprehensive project monitoring.
 
 ## Table of Contents
 
@@ -33,12 +30,12 @@ cargo install cargo-mate
 ```
 ## 📁 Project Structure
 
-This is the **published wrapper crate** for Cargo Mate. While the core implementation is protected, this repository maintains a proper Rust project structure:
+This is Cargo Mate. Please references tools.md for all the available tool commands after reading this page 
 
 ```
 cargo-mate/
 ├── captain/                 # Published crate source
-│   ├── src/                # Minimal wrapper code
+│   ├── src/                # Minimal  code
 │   ├── Cargo.toml         # Package configuration
 │   ├── README.md          # Documentation
 │   ├── linux/             # Linux binaries
@@ -49,12 +46,12 @@ cargo-mate/
 │   ├── advanced_features.rs # Advanced usage
 │   └── README.md          # Examples documentation
 ├── tests/                  # Integration tests
-│   ├── integration_test.rs # Wrapper functionality tests
+│   ├── integration_test.rs #  functionality tests
 │   ├── wrapper_test.rs     # Script validation tests
 │   └── README.md          # Test documentation
 └── sh/                     # Installation scripts
     ├── install.sh         # Main installer
-    └── wrapper-*.sh      # Platform-specific wrappers
+    └── wrapper-*.sh      # Platform-specific 
 ### Journey Commands
 ```bash
 cm journey                 # Show journey overview

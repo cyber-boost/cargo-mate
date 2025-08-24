@@ -19,6 +19,7 @@ exclude = ["target/"]
 # Include all the wrapper scripts and protected binaries
 include = [
     "README.md",
+    "tools.md",
     "sh/install.sh",
     "sh/wrapper-linux.sh",
     "sh/wrapper-macos.sh",

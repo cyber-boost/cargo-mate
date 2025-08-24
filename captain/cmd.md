@@ -277,7 +277,7 @@ cm config shortcut fast "cargo build --release"
 cm config hook pre-build "echo 'Starting build...'"
 
 # License and registration
-cm register CM-12345-67890-ABCDE
+cm register <license>
 cm register --status
 cm user
 
