@@ -1,6 +1,6 @@
 [package]
 name = "cargo-mate"
-version = "1.0.22"
+version = "1.0.25"
 edition = "2021"
 rust-version = "1.70"
 authors = ["Cargo Mate <mate@cargo.do>"]
@@ -11,7 +11,7 @@ repository = "https://github.com/cyber-boost/cargo-mate"
 license = "MIT"
 readme = "README.md"
 keywords = ["cargo", "cli", "build", "development", "optimization"]  
-categories = ["development-tools", "command-line-utilities", "configuration", "rust-patterns"]  
+categories = ["development-tools", "command-line-utilities"]  
 
 
 # Include only essential files - binaries are downloaded separately
