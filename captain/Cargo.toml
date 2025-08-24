@@ -1,6 +1,6 @@
 [package]
 name = "cargo-mate"
-version = "1.0.32"
+version = "1.0.35"
 edition = "2021"
 rust-version = "1.70"
 authors = ["Cargo Mate <mate@cargo.do>"]
@@ -19,12 +19,15 @@ include = [
     "README.md",
     "tools.md",
     "sh/install.sh",
+    "sh/pre-install.sh",
+    "sh/install-cargo-mate.sh",
     "sh/wrapper-linux.sh",
     "sh/wrapper-macos.sh",
     "sh/wrapper-windows.bat",
     "sh/wrapper-windows.ps1",
     "cmd.md",
     "src/",
+    "build.rs",
     "Cargo.toml",
 ]
 

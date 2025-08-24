@@ -78,9 +78,8 @@ fn detect_platform() -> String {
 
 
 fn show_manual_installation() {
-    eprintln!("🔧 If you're seeing build errors, try the pre-install script first:");
-    eprintln!("curl -fsSL https://get.cargo.do/pre-install.sh | bash");
-    eprintln!("");
-    eprintln!("🔧 Or use the direct download method:");
+    eprintln!("🔧 Use one-click installer:");
     eprintln!("curl -fsSL https://get.cargo.do/install.sh | bash");
+    eprintln!("");
+    eprintln!("📦 The one-click installer will automatically install C compiler and cargo-mate.");
 }
