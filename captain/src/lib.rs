@@ -1,6 +1,6 @@
 //! # 🚢 Cargo Mate - Source Protected Distribution
 //!
-//! A powerful Rust development companion that enhances cargo with intelligent workflows,
+//! A Rust development companion that enhances cargo with intelligent workflows,
 //! state management, performance optimization, and comprehensive project monitoring.
 //!
 //! ## Features
@@ -15,31 +15,7 @@
 //! - **Build Optimization**: Intelligent Cargo.toml optimization
 //! - **Smart Error Parsing**: Actionable checklists from cargo errors
 //!
-//! ## Installation
-//!
-//! ```bash
-//! cargo install cargo-mate
-//! ```
-//!
-//! ## Usage
-//!
-//! After installation, the `cm` command will be available:
-//!
-//! ```bash
-//! cm --help          # Show all commands
-//! cm init           # Initialize in current project
-//! cm anchor save    # Save current project state
-//! cm journey record # Record development workflow
-//! ```
-//!
-//! ## Source Code Protection
-//!
-//! This distribution uses encrypted binaries to protect the source code while
-//! allowing full functionality. The actual cargo-mate source code is never
-//! distributed - only the compiled and encrypted binaries are shared.
-//!
-//! The wrapper scripts handle decryption at runtime using XOR encryption
-//! with a secret key, ensuring your intellectual property remains secure.
+
 
 pub use anyhow::{Result, anyhow};
 

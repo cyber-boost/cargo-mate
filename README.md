@@ -1,19 +1,10 @@
-# 🚢 Cargo Mate
-- 🚢 Your project is a ship
-- ⚓ Anchors save your position
-- 🌊 Tide charts track the flow
-- 🗺️ Maps show the territory
-- 🏴‍☠️ Mutiny overrides the captain
-- 📝 Captain's log records the journey
-- 🚢 Auto-versioning keeps your ship on course
-- 🚀 Build optimization gives you the wind in your sails
-
+[![Cargo Mate Logo](logo.svg)](https://github.com/cyber-boost/cargo-mate)
 A powerful Rust development companion that enhances cargo with intelligent workflows, state management, performance optimization, and comprehensive project monitoring.
 
-## 📋 Table of Contents
+## Table of Contents
 
-- [🚀 Quick Start](#-quick-start)
-- [📚 Command Reference](#-command-reference)
+- [Quick Start](#-quick-start)
+- [Command Reference](#-command-reference)
   - [Journey Commands](#journey-commands)
   - [Anchor Commands](#anchor-commands)
   - [Log Commands](#log-commands)
@@ -25,12 +16,12 @@ A powerful Rust development companion that enhances cargo with intelligent workf
   - [View Commands](#view-commands)
   - [Optimize Commands](#optimize-commands)
   - [General Commands](#general-commands)
-- [🔧 Installation](#-installation)
-- [⚙️ Configuration](#️-configuration)
-- [🎯 Examples](#-examples)
-- [📄 License](#-license)
+- [Installation](#-installation)
+- [Configuration](#️-configuration)
+- [Examples](#-examples)
+- [License](#-license)
 
-## 📚 MOST IMPORANT : AFTER INSTALL RUN 
+## MOST IMPORANT : AFTER INSTALL RUN 
 cm install && cm activate 
 
 ### Journey Commands
@@ -161,7 +152,7 @@ cm --help                  # Show help information
 cm --version               # Show version information
 ```
 
-### 🎬 Journey Recording & Playback
+### Journey Recording & Playback
 Record your command sequences and replay them perfectly. Great for onboarding, CI/CD, and sharing workflows.
 ```bash
 cm journey record build-flow    # Start recording
@@ -190,20 +181,20 @@ cm anchor auto my-project --foreground
 
 # Files are automatically updated when you edit them!
 # You'll see notifications like:
-# 🔄 [14:32:15] Updated src/main.rs in anchor 'my-project'
+# [14:32:15] Updated src/main.rs in anchor 'my-project'
 
 # Stop auto-update when done
 cm anchor stop my-project
 ```
 
 **Auto-Update Features:**
-- 🔄 **Real-time Updates**: Files are saved to anchor immediately when changed
-- 🚀 **Background Mode**: Non-blocking, runs while you continue working
-- ⚡ **Efficient**: Only updates specifically modified files
-- 📊 **Smart Monitoring**: Automatically watches relevant directories
-- 🛑 **Easy Control**: Simple start/stop commands
+- **Real-time Updates**: Files are saved to anchor immediately when changed
+- **Background Mode**: Non-blocking, runs while you continue working
+- **Efficient**: Only updates specifically modified files
+- **Smart Monitoring**: Automatically watches relevant directories
+- **Easy Control**: Simple start/stop commands
 
-### 📝 Captain's Log
+### Captain's Log
 Natural language build notes with automatic tagging and search.
 ```bash
 cm log add "Switching to async runtime" --tags async,refactor
@@ -218,7 +209,7 @@ cm tide show                    # Interactive charts
 cm tide analyze                 # Dependency analysis
 ```
 
-### 🗺️ Treasure Maps
+### Treasure Maps
 Visualize and analyze your dependency tree.
 ```bash
 cm map show                     # Show dependency tree
@@ -226,7 +217,7 @@ cm map path serde tokio         # Find path between deps
 cm map analyze                  # Full analysis
 ```
 
-### 🏴‍☠️ Mutiny Mode
+### Mutiny Mode
 Override cargo's restrictions when you know what you're doing.
 ```bash
 cm mutiny allow-warnings        # Temporarily allow warnings
@@ -234,7 +225,7 @@ cm mutiny skip-tests            # Skip tests for quick builds
 cm mutiny yolo                  # DANGER: Disable all checks for 30 min
 ```
 
-### 🚢 Auto-Versioning
+### Auto-Versioning
 Automatic version incrementing with semantic versioning support.
 ```bash
 cm version init                 # Initialize versioning
@@ -242,7 +233,7 @@ cm version increment minor      # Manual version bump
 # Auto-increments on every build/check operation
 ```
 
-### 🚀 Build Optimization
+### Build Optimization
 Automatically optimize your Cargo.toml for maximum build performance.
 ```bash
 cm optimize aggressive          # Maximum speed optimizations
@@ -251,7 +242,7 @@ cm optimize recommendations     # Get optimization advice
 cm optimize restore             # Restore original settings
 ```
 
-### ⚙️ Smart Configuration
+### Smart Configuration
 Project-local and global configuration with shortcuts and hooks.
 ```bash
 cm config init                  # Create local .cg config
@@ -259,7 +250,7 @@ cm config shortcut b "build --release" --local
 cm config hook pre_build "cargo fmt"
 ```
 
-### 🔍 Build Result Viewing
+### Build Result Viewing
 Comprehensive viewing of build results, artifacts, and generated files.
 ```bash
 cm view errors                  # View all errors
@@ -267,7 +258,7 @@ cm view artifacts              # View generated files
 cm view all                    # View everything in one place
 ```
 
-### 📋 Smart Error Parsing
+### Smart Error Parsing
 Transforms cargo errors into actionable checklists with fix suggestions.
 ```bash
 cm checklist                    # Show current error/warning checklist
@@ -288,7 +279,7 @@ cp target/release/cm ~/.local/bin/
 cm init
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 ### Project Configuration (.cg)
 ```toml
@@ -317,7 +308,7 @@ parallel_jobs = 4
 incremental = true
 ```
 
-## 🎯 Examples
+## Some Examples
 
 ### Development Workflow
 ```bash
@@ -360,11 +351,21 @@ cargo test   # 1.0.1 -> 1.0.2
 cm version increment minor  # 1.0.2 -> 1.1.0
 ```
 
+# 🚢 Cargo Mate
+- 🚢 Your project is a ship
+- ⚓ Anchors save your position
+- 🌊 Tide charts track the flow
+- 🗺️ Maps show the territory
+- 🏴‍☠️ Mutiny overrides the captain
+- 📝 Captain's log records the journey
+- 🚢 Auto-versioning keeps your ship on course
+- 🚀 Build optimization gives you the wind in your sails
 
 
 ## 📄 BBL License (NOT MIT)
 
-BBL License - see LICENSE file for details.
+BBL License
+For the full license text, visit: [cargo.do/license](https://cargo.do/license)
 
 ---
 

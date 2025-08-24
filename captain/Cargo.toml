@@ -2,15 +2,19 @@
 name = "cargo-mate"
 version = "1.0.6"
 edition = "2021"
+rust-version = "1.70"
 authors = ["Cargo Mate <mate@cargo.do>"]
 description = "Rust development companion that enhances cargo with intelligent workflows, state management, performance optimization, and comprehensive project monitoring"
+documentation = "https://cargo.do/docs"  
+homepage = "https://cargo.do"
+repository = "https://github.com/cyber-boost/cargo-mate"
 license = "BBL"
 readme = "README.md"
-homepage = "https://github.com/cyber-boost/cargo-mate"
-repository = "https://github.com/cyber-boost/cargo-mate"
-keywords = ["cargo", "rust", "development", "cli", "productivity", "build", "optimization"]
-categories = ["development-tools", "command-line-utilities"]
+keywords = ["cargo", "cli", "build", "development", "optimization"]  
+categories = ["development-tools", "command-line-utilities", "configuration", "rust-patterns"]  
 exclude = ["target/"]
+
+
 
 # Include all the wrapper scripts and protected binaries
 include = [
@@ -25,6 +29,7 @@ include = [
     "macos/cargo-mate-macos-x86_64.protected",
     "macos/cargo-mate-macos-aarch64.protected",
     "windows/cargo-mate-windows-x86_64.exe.protected",
+    "cmd.md",
 ]
 
 [lib]
@@ -40,6 +45,9 @@ path = "src/main.rs"
 # Metadata for crates.io
 [package.metadata]
 supported-platforms = ["linux-x86_64", "linux-aarch64", "macos-x86_64", "macos-aarch64", "windows-x86_64"]
+
+[badges]
+maintenance = { status = "actively-developed" }  # or "passively-maintained", "as-is", "experimental", "looking-for-maintainer", "deprecated", "none"
 
 [dependencies]
 # Minimal dependencies for the installer

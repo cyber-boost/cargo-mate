@@ -3,6 +3,19 @@ target/
 Cargo.lock
 **/*.rs.bk
 
+checksums.sha256
+checksums.sha512
+checksums.sha1
+checksums.md5
+checksums.sha256
+checksums.sha512
+checksums.sha1
+checksums.md5
+checksums.sha256
+checksums.sha512
+checksums.sha1
+checksums.md5
+
 # IDE files
 .vscode/
 .idea/
