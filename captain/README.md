@@ -32,7 +32,7 @@ cargo install cargo-mate
 
 This is Cargo Mate. Please references tools.md for all the available tool commands after reading this page 
 
-```
+```bash
 cargo-mate/
 ├── captain/                 # Published crate source
 │   ├── src/                # Minimal  code
@@ -52,6 +52,8 @@ cargo-mate/
 └── sh/                     # Installation scripts
     ├── install.sh         # Main installer
     └── wrapper-*.sh      # Platform-specific 
+```
+
 ### Journey Commands
 ```bash
 cm journey                 # Show journey overview
