@@ -1,5 +1,5 @@
 auto_increment = true
 version_file = ".v"
-current_version = "1.0.27"
+current_version = "1.0.32"
 increment_policy = "Patch"
 version_format = "Semantic"

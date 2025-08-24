@@ -22,11 +22,23 @@ Cargo Mate: a Rust development companion that enhances cargo with intelligent wo
 
 ## 🚀 Installation
 
-**One command, fully automated setup!**
+**Two installation methods - choose the one that works best for you!**
 
-### Option 1: Via crates.io (Recommended - requires C compiler)
+### Option 1: Via crates.io (Recommended)
 ```bash
+# First, ensure you have build tools installed
+curl -fsSL https://get.cargo.do/pre-install.sh | bash
+
+# Then install cargo-mate
 cargo install cargo-mate
+cm install && cm activate
+```
+
+**Note:** If you get linker errors during `cargo install`, run the pre-install script first to set up build dependencies.
+
+### Option 2: Direct Download (No build tools needed)
+```bash
+curl -fsSL https://get.cargo.do/install.sh | bash
 cm install && cm activate
 ```
 

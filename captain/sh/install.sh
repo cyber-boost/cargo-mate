@@ -6,6 +6,17 @@
 
 set -euo pipefail
 
+# Check if this is being run as a pre-install check
+if [[ "${1:-}" == "--pre-install-check" ]]; then
+    echo "🔧 Running pre-install dependency check..."
+    check_build_dependencies
+    echo "✅ Build dependencies are ready!"
+    echo ""
+    echo "🚀 You can now safely run:"
+    echo "   cargo install cargo-mate"
+    exit 0
+fi
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
