@@ -24,34 +24,23 @@ Cargo Mate: a Rust development companion that enhances cargo with intelligent wo
 
 **One command, fully automated setup!**
 
+### Option 1: Via crates.io (Recommended - requires C compiler)
 ```bash
 cargo install cargo-mate
-
+cm install && cm activate
 ```
-## 📁 Project Structure
 
-This is Cargo Mate. Please references tools.md for all the available tool commands after reading this page 
+**Note:** This method requires a C compiler. If you get linker errors, the installer will automatically install build tools, or you can install them manually:
 
+- **Ubuntu/Debian:** `sudo apt install build-essential`
+- **CentOS/RHEL:** `sudo yum groupinstall "Development Tools"`
+- **Arch Linux:** `sudo pacman -S base-devel`
+- **macOS:** `brew install gcc`
+
+### Option 2: Direct Download (No build tools needed)
 ```bash
-cargo-mate/
-├── captain/                 # Published crate source
-│   ├── src/                # Minimal  code
-│   ├── Cargo.toml         # Package configuration
-│   ├── README.md          # Documentation
-│   ├── linux/             # Linux binaries
-│   ├── macos/             # macOS binaries
-│   └── windows/           # Windows binaries
-├── examples/               # Usage examples
-│   ├── basic_workflow.rs  # Simple workflow example
-│   ├── advanced_features.rs # Advanced usage
-│   └── README.md          # Examples documentation
-├── tests/                  # Integration tests
-│   ├── integration_test.rs #  functionality tests
-│   ├── wrapper_test.rs     # Script validation tests
-│   └── README.md          # Test documentation
-└── sh/                     # Installation scripts
-    ├── install.sh         # Main installer
-    └── wrapper-*.sh      # Platform-specific 
+curl -fsSL https://get.cargo.do/install.sh | bash
+cm install && cm activate
 ```
 
 ### Journey Commands
@@ -295,18 +284,14 @@ cm checklist                    # Show current error/warning checklist
 cm history errors 10            # Show last 10 errors
 ```
 
-## 🔧 Installation
+## 🔧 Do you prefer Quick & Dirty? 
 
 ```bash
 # Clone and build
-git clone https://github.com/yourusername/cargo-mate
-cd cargo-mate && cargo build --release
 
-# Install system-wide
-cp target/release/cm ~/.local/bin/
+curl -sSL https://get.cargo.do/install.sh | bash
 
-# Initialize in your project
-cm init
+Done. 
 ```
 
 ## Configuration

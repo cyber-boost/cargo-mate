@@ -40,6 +40,61 @@ log_error() {
     echo -e "${RED}❌ $1${NC}"
 }
 
+# Check and install build dependencies
+check_build_dependencies() {
+    log_info "Checking for build dependencies..."
+
+    # Check if we have a C compiler
+    if ! command -v cc >/dev/null 2>&1 && ! command -v gcc >/dev/null 2>&1; then
+        log_warning "C compiler not found. Installing build tools..."
+
+        # Detect package manager and install build tools
+        if command -v apt >/dev/null 2>&1; then
+            log_info "Using apt to install build-essential..."
+            if sudo apt update && sudo apt install -y build-essential; then
+                log_success "Build tools installed successfully!"
+            else
+                log_error "Failed to install build tools. Please run: sudo apt install build-essential"
+                exit 1
+            fi
+        elif command -v yum >/dev/null 2>&1; then
+            log_info "Using yum to install development tools..."
+            if sudo yum groupinstall -y "Development Tools"; then
+                log_success "Build tools installed successfully!"
+            else
+                log_error "Failed to install build tools. Please run: sudo yum groupinstall 'Development Tools'"
+                exit 1
+            fi
+        elif command -v pacman >/dev/null 2>&1; then
+            log_info "Using pacman to install base-devel..."
+            if sudo pacman -S --noconfirm base-devel; then
+                log_success "Build tools installed successfully!"
+            else
+                log_error "Failed to install build tools. Please run: sudo pacman -S base-devel"
+                exit 1
+            fi
+        elif command -v brew >/dev/null 2>&1; then
+            log_info "Using brew to install build tools..."
+            if brew install gcc; then
+                log_success "Build tools installed successfully!"
+            else
+                log_error "Failed to install build tools. Please run: brew install gcc"
+                exit 1
+            fi
+        else
+            log_error "No supported package manager found."
+            log_error "Please install a C compiler manually:"
+            log_error "  Ubuntu/Debian: sudo apt install build-essential"
+            log_error "  CentOS/RHEL: sudo yum groupinstall 'Development Tools'"
+            log_error "  Arch: sudo pacman -S base-devel"
+            log_error "  macOS: brew install gcc"
+            exit 1
+        fi
+    else
+        log_success "Build tools already available!"
+    fi
+}
+
 # Detect platform and architecture
 detect_platform() {
     OS=$(uname -s | tr '[:upper:]' '[:lower:]')
@@ -193,6 +248,7 @@ verify_installation() {
 main() {
     log_info "🚢 Installing Cargo Mate (Source Protected)"
     detect_platform
+    check_build_dependencies
     create_install_dir
     download_and_install
     verify_installation

@@ -1,6 +1,6 @@
 [package]
 name = "cargo-mate"
-version = "1.0.25"
+version = "1.0.27"
 edition = "2021"
 rust-version = "1.70"
 authors = ["Cargo Mate <mate@cargo.do>"]

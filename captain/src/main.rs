@@ -3,7 +3,6 @@
 use std::env;
 use std::fs;
 use std::os::unix::fs::PermissionsExt;
-use std::path::Path;
 use std::process::Command;
 
 // Embedded install scripts - these are compiled into the binary
