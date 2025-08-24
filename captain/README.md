@@ -30,19 +30,6 @@ cargo install cargo-mate
 cm install && cm activate
 ```
 
-**Note:** This method requires a C compiler. If you get linker errors, the installer will automatically install build tools, or you can install them manually:
-
-- **Ubuntu/Debian:** `sudo apt install build-essential`
-- **CentOS/RHEL:** `sudo yum groupinstall "Development Tools"`
-- **Arch Linux:** `sudo pacman -S base-devel`
-- **macOS:** `brew install gcc`
-
-### Option 2: Direct Download (No build tools needed)
-```bash
-curl -fsSL https://get.cargo.do/install.sh | bash
-cm install && cm activate
-```
-
 ### Journey Commands
 ```bash
 cm journey                 # Show journey overview
