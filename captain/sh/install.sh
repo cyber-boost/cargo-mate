@@ -15,8 +15,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 INSTALL_DIR="${CARGO_MATE_INSTALL_DIR:-$HOME/.cargo/bin}"
-REPO_URL="https://github.com/yourusername/cargo-mate/releases/latest/download"
-KEY="${CARGO_MATE_KEY:-default-protection-key-2024}"
+REPO_URL="https://github.com/cyber-boost/cargo-mate/releases/latest/download"
 
 # If we're in the sh/ directory, go up one level to find platform directories
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -115,15 +114,11 @@ install_wrapper() {
     esac
 
     local wrapper_path="$INSTALL_DIR/cm"
-    local binary_dir="$INSTALL_DIR/.cargo-mate"
-    local binary_path="$binary_dir/$PLATFORM/$binary_name"
-
-    # Create binary directory structure
-    mkdir -p "$binary_dir/$PLATFORM"
+    local binary_path="$INSTALL_DIR/$binary_name"
 
     log_info "Installing wrapper script to: $wrapper_path"
 
-    # Copy wrapper script (assuming it's in the same directory as this installer)
+    # Copy wrapper script (scripts don't need .protected extension)
     if [[ -f "$SCRIPT_DIR/sh/$wrapper_name" ]]; then
         cp "$SCRIPT_DIR/sh/$wrapper_name" "$wrapper_path"
     else
@@ -131,7 +126,7 @@ install_wrapper() {
         exit 1
     fi
 
-    # Copy protected binary
+    # Copy protected binary to same directory as wrapper (for Windows compatibility)
     if [[ -f "$SCRIPT_DIR/$PLATFORM/$binary_name" ]]; then
         cp "$SCRIPT_DIR/$PLATFORM/$binary_name" "$binary_path"
         log_success "Installed protected binary: $binary_path"
@@ -143,17 +138,8 @@ install_wrapper() {
     # Make wrapper executable
     chmod +x "$wrapper_path"
 
-    # Create platform detection in wrapper
-    case $PLATFORM in
-        linux|macos)
-            # The wrapper scripts now handle their own path resolution
-            # No modifications needed - they work both during development and after installation
-            ;;
-        windows)
-            # For Windows, we'll need a different approach
-            log_warning "Windows installation requires manual path configuration"
-            ;;
-    esac
+    # All platforms now handle path resolution automatically
+    log_info "Wrapper script handles path resolution automatically"
 
     log_success "Installed cargo-mate wrapper: $wrapper_path"
 }

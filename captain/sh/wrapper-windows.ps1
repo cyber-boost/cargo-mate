@@ -40,50 +40,15 @@ $TempDir = Join-Path $env:TEMP "cargo-mate-$(Get-Random)"
 New-Item -ItemType Directory -Path $TempDir -Force | Out-Null
 $DecryptedBinary = Join-Path $TempDir "cargo-mate-decrypted.exe"
 
+# The .protected files are the actual binaries - no decryption needed
+Write-Host "✅ Executing protected binary directly"
+
+# Execute the protected binary directly
 try {
-    # Read encrypted binary
-    $EncryptedData = [System.IO.File]::ReadAllBytes($ProtectedBinary)
-
-    # Handle cargo-mate format
-    $Header = [System.Text.Encoding]::ASCII.GetString($EncryptedData[0..31])
-    if ($Header -eq "CARGO_MATE_ENCRYPTED_BINARY_V1") {
-        $Lines = [System.Text.Encoding]::UTF8.GetString($EncryptedData) -split "`n"
-        if ($Lines.Length -ge 3) {
-            $Key = $Lines[1]  # Use embedded key
-            $EncryptedData = [System.Text.Encoding]::UTF8.GetBytes(($Lines[2..($Lines.Length-1)] -join "`n"))
-        } else {
-            $EncryptedData = $EncryptedData[32..($EncryptedData.Length-1)]
-        }
-    }
-
-    # Create SHA256 hash of the key
-    $Sha256 = [System.Security.Cryptography.SHA256]::Create()
-    $KeyBytes = [System.Text.Encoding]::UTF8.GetBytes($Key)
-    $KeyHash = $Sha256.ComputeHash($KeyBytes)
-
-    # XOR decryption
-    $DecryptedData = New-Object byte[] $EncryptedData.Length
-    for ($i = 0; $i -lt $EncryptedData.Length; $i++) {
-        $DecryptedData[$i] = $EncryptedData[$i] -bxor $KeyHash[$i % $KeyHash.Length]
-    }
-
-    # Write decrypted binary
-    [System.IO.File]::WriteAllBytes($DecryptedBinary, $DecryptedData)
-
-    Write-Host "✅ Binary decrypted successfully"
-}
-catch {
-    Write-Warning "⚠️  PowerShell decryption failed, using fallback method"
-    # Simple fallback - just copy the binary (if it's not actually encrypted)
-    Copy-Item $ProtectedBinary $DecryptedBinary -Force
-}
-
-# Execute the decrypted binary
-try {
-    & $DecryptedBinary @CargoArgs
+    & $ProtectedBinary @CargoArgs
 }
 finally {
-    # Cleanup
+    # Cleanup temp directory (even though we don't use it anymore)
     if (Test-Path $TempDir) {
         Remove-Item $TempDir -Recurse -Force
     }
