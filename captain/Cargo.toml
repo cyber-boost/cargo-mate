@@ -1,6 +1,6 @@
 [package]
 name = "cargo-mate"
-version = "1.0.68"
+version = "1.0.73"
 edition = "2021"
 rust-version = "1.70"
 authors = ["Cargo Mate <mate@cargo.do>"]
@@ -14,21 +14,7 @@ keywords = ["cargo", "cli", "build", "development", "optimization"]
 categories = ["development-tools", "command-line-utilities"]  
 
 
-# Include only essential files - binaries are downloaded separately
-include = [
-    "README.md",
-    "tools.md",
-    "sh/install.sh",
-    "sh/pre-install.sh",
-    "sh/install-cargo-mate.sh",
-    "sh/wrapper-linux.sh",
-    "sh/wrapper-macos.sh",
-    "sh/wrapper-windows.bat",
-    "sh/wrapper-windows.ps1",
-    "cmd.md",
-    "src/main.rs",
-    "Cargo.toml",
-]
+
 
 # Exclude backup files and other non-essential files
 exclude = [
@@ -39,6 +25,7 @@ exclude = [
     "*.protected",
     "*.exe",
     "*.backup",
+    "checksums.sha256",
 ]
 
 # Removed library target - this is purely a binary package
