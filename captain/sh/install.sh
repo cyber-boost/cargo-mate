@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 INSTALL_DIR="${CARGO_MATE_INSTALL_DIR:-$HOME/.cargo/bin}"
-REPO_URL="https://github.com/cyber-boost/cargo-mate/releases/latest/download"
+DOWNLOAD_URL="https://get.cargo.do/latest.tar.gz"
 
 # If we're in the sh/ directory, go up one level to find platform directories
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -93,55 +93,83 @@ create_install_dir() {
     fi
 }
 
-# Download and install wrapper script
-install_wrapper() {
-    local wrapper_name
-    local binary_name
+# Download and install binaries
+download_and_install() {
+    local temp_dir
+    temp_dir=$(mktemp -d)
+    local tarball_path="$temp_dir/cargo-mate.tar.gz"
 
+    log_info "Downloading cargo-mate binaries from $DOWNLOAD_URL"
+
+    # Download the tarball
+    if command -v curl >/dev/null 2>&1; then
+        curl -L -o "$tarball_path" "$DOWNLOAD_URL"
+    elif command -v wget >/dev/null 2>&1; then
+        wget -O "$tarball_path" "$DOWNLOAD_URL"
+    else
+        log_error "Neither curl nor wget found. Please install one of them."
+        exit 1
+    fi
+
+    # Extract the tarball
+    log_info "Extracting binaries..."
+    tar -xzf "$tarball_path" -C "$temp_dir"
+
+    # Find the binary for this platform
+    local binary_name
     case $PLATFORM in
         linux)
-            wrapper_name="wrapper-linux.sh"
             binary_name="cargo-mate-linux-${ARCH}.protected"
             ;;
         macos)
-            wrapper_name="wrapper-macos.sh"
             binary_name="cargo-mate-macos-${ARCH}.protected"
             ;;
         windows)
-            wrapper_name="wrapper-windows.bat"
             binary_name="cargo-mate-windows-x86_64.exe.protected"
             ;;
     esac
 
-    local wrapper_path="$INSTALL_DIR/cm"
+    local wrapper_name
+    case $PLATFORM in
+        linux)
+            wrapper_name="wrapper-linux.sh"
+            ;;
+        macos)
+            wrapper_name="wrapper-macos.sh"
+            ;;
+        windows)
+            wrapper_name="wrapper-windows.bat"
+            ;;
+    esac
+
     local binary_path="$INSTALL_DIR/$binary_name"
+    local wrapper_path="$INSTALL_DIR/cm"
 
-    log_info "Installing wrapper script to: $wrapper_path"
+    # Install the binary
+    if [[ -f "$temp_dir/pkg/releases/$binary_name" ]]; then
+        cp "$temp_dir/pkg/releases/$binary_name" "$binary_path"
+        log_success "Installed protected binary: $binary_path"
+    else
+        log_error "Binary not found in download: $binary_name"
+        log_info "Available binaries:"
+        ls -la "$temp_dir/pkg/releases/"
+        exit 1
+    fi
 
-    # Copy wrapper script (scripts don't need .protected extension)
+    # Install the wrapper script
     if [[ -f "$SCRIPT_DIR/sh/$wrapper_name" ]]; then
         cp "$SCRIPT_DIR/sh/$wrapper_name" "$wrapper_path"
+        chmod +x "$wrapper_path"
+        log_success "Installed wrapper script: $wrapper_path"
     else
         log_error "Wrapper script not found: $SCRIPT_DIR/sh/$wrapper_name"
         exit 1
     fi
 
-    # Copy protected binary to same directory as wrapper (for Windows compatibility)
-    if [[ -f "$SCRIPT_DIR/$PLATFORM/$binary_name" ]]; then
-        cp "$SCRIPT_DIR/$PLATFORM/$binary_name" "$binary_path"
-        log_success "Installed protected binary: $binary_path"
-    else
-        log_error "Protected binary not found: $SCRIPT_DIR/$PLATFORM/$binary_name"
-        exit 1
-    fi
+    # Clean up
+    rm -rf "$temp_dir"
 
-    # Make wrapper executable
-    chmod +x "$wrapper_path"
-
-    # All platforms now handle path resolution automatically
-    log_info "Wrapper script handles path resolution automatically"
-
-    log_success "Installed cargo-mate wrapper: $wrapper_path"
+    log_success "Cargo Mate installed successfully!"
 }
 
 # Verify installation
@@ -166,7 +194,7 @@ main() {
     log_info "🚢 Installing Cargo Mate (Source Protected)"
     detect_platform
     create_install_dir
-    install_wrapper
+    download_and_install
     verify_installation
 }
 

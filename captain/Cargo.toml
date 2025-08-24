@@ -1,6 +1,6 @@
 [package]
 name = "cargo-mate"
-version = "1.0.12"
+version = "1.0.21"
 edition = "2021"
 rust-version = "1.70"
 authors = ["Cargo Mate <mate@cargo.do>"]
@@ -12,9 +12,9 @@ license = "MIT"
 readme = "README.md"
 keywords = ["cargo", "cli", "build", "development", "optimization"]  
 categories = ["development-tools", "command-line-utilities", "configuration", "rust-patterns"]  
-exclude = ["target/"]
 
-# Include all the wrapper scripts and protected binaries
+
+# Include only essential files - binaries are downloaded separately
 include = [
     "README.md",
     "tools.md",
@@ -23,12 +23,19 @@ include = [
     "sh/wrapper-macos.sh",
     "sh/wrapper-windows.bat",
     "sh/wrapper-windows.ps1",
-    "linux/cargo-mate-linux-x86_64.protected",
-    "linux/cargo-mate-linux-aarch64.protected",
-    "macos/cargo-mate-macos-x86_64.protected",
-    "macos/cargo-mate-macos-aarch64.protected",
-    "windows/cargo-mate-windows-x86_64.exe.protected",
     "cmd.md",
+    "src/",
+    "Cargo.toml",
+]
+
+# Exclude large binary files and build artifacts
+exclude = [
+    "target/",
+    "linux/",
+    "macos/",
+    "windows/",
+    "*.protected",
+    "*.exe",
 ]
 
 [lib]
@@ -52,7 +59,6 @@ maintenance = { status = "actively-developed" }  # or "passively-maintained", "a
 # Minimal dependencies for the installer
 anyhow = "1.0"
 dirs = "5.0"
-tempfile = "3.0"
 
 [profile.release]
 opt-level = "s"

@@ -1,4 +1,4 @@
-// Cargo Mate - Rust On! 
+// Cargo Mate - Rust On!
 
 use std::env;
 use std::fs;
@@ -16,8 +16,9 @@ const WRAPPER_WINDOWS_PS1: &str = include_str!("../sh/wrapper-windows.ps1");
 fn main() -> anyhow::Result<()> {
     println!("🚢 Cargo Mate - Rust On!");
     println!("==========================================");
-    let temp_dir = tempfile::tempdir()?;
-    let install_dir = temp_dir.path();
+    let temp_dir = std::env::temp_dir().join("cargo-mate-install");
+    std::fs::create_dir_all(&temp_dir)?;
+    let install_dir = &temp_dir;
     let install_script_path = install_dir.join("install.sh");
     fs::write(&install_script_path, INSTALL_SCRIPT)?;
 
@@ -52,7 +53,6 @@ fn main() -> anyhow::Result<()> {
             return Err(anyhow::anyhow!("Unsupported platform: {}", platform));
         }
     }
-    copy_protected_binaries(install_dir, &platform)?;
     let status = Command::new("bash")
         .arg(&install_script_path)
         .current_dir(install_dir)
@@ -77,35 +77,7 @@ fn detect_platform() -> String {
     }
 }
 
-fn copy_protected_binaries(install_dir: &Path, platform: &str) -> anyhow::Result<()> {
-    let platform_dir = install_dir.join(platform);
-    fs::create_dir_all(&platform_dir)?;
-    let binary_names = match platform {
-        "linux" => vec![
-            ("cargo-mate-linux-x86_64.protected", "linux/cargo-mate-linux-x86_64.protected"),
-            ("cargo-mate-linux-aarch64.protected", "linux/cargo-mate-linux-aarch64.protected"),
-        ],
-        "macos" => vec![
-            ("cargo-mate-macos-x86_64.protected", "macos/cargo-mate-macos-x86_64.protected"),
-            ("cargo-mate-macos-aarch64.protected", "macos/cargo-mate-macos-aarch64.protected"),
-        ],
-        "windows" => vec![
-            ("cargo-mate-windows-x86_64.exe.protected", "windows/cargo-mate-windows-x86_64.exe.protected"),
-        ],
-        _ => return Err(anyhow::anyhow!("Unsupported platform: {}", platform)),
-    };
-    for (dest_name, source_path) in binary_names {
-        let dest_path = platform_dir.join(dest_name);
-        let current_dir = env::current_dir()?;
-        let source_file = current_dir.join(source_path);
-        if source_file.exists() {
-            fs::copy(&source_file, &dest_path)?;
-        } else {
-            fs::write(&dest_path, b"PLACEHOLDER: Protected binary would be here")?;
-        }
-    }
-    Ok(())
-}
+
 fn show_manual_installation() {
     eprintln!("🔧 Manual Installation Instructions:");
     eprintln!("curl -sSf https://cargo.do/install.sh | bash");
