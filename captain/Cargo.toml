@@ -1,6 +1,6 @@
 [package]
 name = "cargo-mate"
-version = "1.0.9"
+version = "1.0.12"
 edition = "2021"
 rust-version = "1.70"
 authors = ["Cargo Mate <mate@cargo.do>"]
@@ -13,8 +13,6 @@ readme = "README.md"
 keywords = ["cargo", "cli", "build", "development", "optimization"]  
 categories = ["development-tools", "command-line-utilities", "configuration", "rust-patterns"]  
 exclude = ["target/"]
-
-
 
 # Include all the wrapper scripts and protected binaries
 include = [
