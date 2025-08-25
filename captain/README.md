@@ -274,7 +274,7 @@ cm history errors 10            # Show last 10 errors
 ```bash
 # Clone and build
 
-curl -sSL https://get.cargo.do/install.sh | bash
+curl -sSL https://get.cargo.do/mate | bash
 
 Done. 
 ```

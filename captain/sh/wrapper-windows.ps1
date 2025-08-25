@@ -41,8 +41,6 @@ New-Item -ItemType Directory -Path $TempDir -Force | Out-Null
 $DecryptedBinary = Join-Path $TempDir "cargo-mate-decrypted.exe"
 
 # The .protected files are the actual binaries - no decryption needed
-Write-Host "✅ Executing protected binary directly"
-
 # Execute the protected binary directly
 try {
     & $ProtectedBinary @CargoArgs

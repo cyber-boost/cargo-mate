@@ -42,7 +42,6 @@ check_binary() {
 execute_binary() {
     # The .protected files are the actual binaries - no decryption needed
     if [[ -x "$PROTECTED_BINARY" ]]; then
-        echo "✅ Executing protected binary directly"
         exec "$PROTECTED_BINARY" "$@"
     else
         echo "❌ Protected binary not executable: $PROTECTED_BINARY"

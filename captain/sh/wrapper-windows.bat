@@ -30,8 +30,6 @@ mkdir "%TEMP_DIR%" 2>nul
 set "DECRYPTED_BINARY=%TEMP_DIR%\cargo-mate-decrypted.exe"
 
 REM The .protected files are the actual binaries - no decryption needed
-echo ✅ Executing protected binary directly
-
 REM Execute the protected binary directly
 "%PROTECTED_BINARY%" %*
 

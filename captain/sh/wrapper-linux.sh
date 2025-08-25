@@ -30,7 +30,8 @@ detect_arch() {
     local arch=$(uname -m)
     
     # First try to find the binary in .shipwreck/bin (new structure)
-    local shipwreck_bin="$HOME/.shipwreck/bin/cargo-mate-protected"
+    # CRITICAL: Binary MUST be named 'cm' to enhance cargo properly
+    local shipwreck_bin="$HOME/.shipwreck/bin/cm"
     if [[ -f "$shipwreck_bin" ]]; then
         PROTECTED_BINARY="$shipwreck_bin"
         return 0
@@ -65,7 +66,6 @@ check_binary() {
 execute_binary() {
     # The .protected files are the actual binaries - no decryption needed
     if [[ -x "$PROTECTED_BINARY" ]]; then
-        echo "✅ Executing protected binary directly"
         exec "$PROTECTED_BINARY" "$@"
     else
         echo "❌ Protected binary not executable: $PROTECTED_BINARY"

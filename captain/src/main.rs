@@ -1,82 +1,89 @@
 // Cargo Mate - Rust On!
+// A publishable binary that provides installation instructions and downloads required scripts
 
 use std::env;
-use std::fs;
 use std::process::Command;
-
-// Embedded install scripts - these are compiled into the binary
-const INSTALL_SCRIPT: &str = include_str!("../sh/install.sh");
-const WRAPPER_LINUX: &str = include_str!("../sh/wrapper-linux.sh");
-const WRAPPER_MACOS: &str = include_str!("../sh/wrapper-macos.sh");
-const WRAPPER_WINDOWS_BAT: &str = include_str!("../sh/wrapper-windows.bat");
-const WRAPPER_WINDOWS_PS1: &str = include_str!("../sh/wrapper-windows.ps1");
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("🚢 Cargo Mate - Rust On!");
     println!("==========================================");
-    let temp_dir = std::env::temp_dir().join("cargo-mate-install");
-    std::fs::create_dir_all(&temp_dir)?;
-    let install_dir = &temp_dir;
-    let install_script_path = install_dir.join("install.sh");
-    fs::write(&install_script_path, INSTALL_SCRIPT)?;
-
-    // Set executable permissions (Unix-like systems)
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        let mut perms = fs::metadata(&install_script_path)?.permissions();
-        perms.set_mode(0o755);
-        fs::set_permissions(&install_script_path, perms)?;
-    }
+    println!("ℹ️  🚢 Installing Cargo Mate (Source Protected)");
 
     let platform = detect_platform();
-    let sh_dir = install_dir.join("sh");
-    fs::create_dir_all(&sh_dir)?;
+    println!("ℹ️  Detected platform: {}", platform);
 
-    match platform.as_str() {
-        "linux" => {
-            let wrapper_path = sh_dir.join("wrapper-linux.sh");
-            fs::write(&wrapper_path, WRAPPER_LINUX)?;
-            #[cfg(unix)]
-            {
-                use std::os::unix::fs::PermissionsExt;
-                let mut perms = fs::metadata(&wrapper_path)?.permissions();
-                perms.set_mode(0o755);
-                fs::set_permissions(&wrapper_path, perms)?;
-            }
-        }
-        "macos" => {
-            let wrapper_path = sh_dir.join("wrapper-macos.sh");
-            fs::write(&wrapper_path, WRAPPER_MACOS)?;
-            #[cfg(unix)]
-            {
-                use std::os::unix::fs::PermissionsExt;
-                let mut perms = fs::metadata(&wrapper_path)?.permissions();
-                perms.set_mode(0o755);
-                fs::set_permissions(&wrapper_path, perms)?;
-            }
-        }
-        "windows" => {
-            fs::write(sh_dir.join("wrapper-windows.bat"), WRAPPER_WINDOWS_BAT)?;
-            fs::write(sh_dir.join("wrapper-windows.ps1"), WRAPPER_WINDOWS_PS1)?;
-        }
-        _ => {
-            return Err(format!("Unsupported platform: {}", platform).into());
-        }
-    }
-    let status = Command::new("bash")
-        .arg(&install_script_path)
-        .current_dir(install_dir)
-        .status()?;
+    // For publishing, we download the installation scripts instead of embedding them
+    println!("ℹ️  Downloading installation scripts...");
 
-    if status.success() {
-        println!("✅ Installation completed successfully!");
-    } else {
-        eprintln!("❌ Installation failed with exit code: {}", status.code().unwrap_or(-1));
-        show_manual_installation();
+    let install_script_url = "https://get.cargo.do/install.sh";
+
+    match download_and_run_installer(&install_script_url) {
+        Ok(_) => {
+            println!("✅ Installation completed successfully!");
+        }
+        Err(e) => {
+            eprintln!("❌ Installation failed: {}", e);
+            show_manual_installation();
+        }
     }
 
     Ok(())
+}
+
+fn download_and_run_installer(url: &str) -> Result<(), Box<dyn std::error::Error>> {
+    // Use curl or wget to download the installer
+    let temp_dir = std::env::temp_dir().join("cargo-mate-install");
+    std::fs::create_dir_all(&temp_dir)?;
+    let install_script_path = temp_dir.join("install.sh");
+
+    let download_success = if command_exists("curl") {
+        Command::new("curl")
+            .args(&["-fsSL", url, "-o", &install_script_path.to_string_lossy()])
+            .status()?
+            .success()
+    } else if command_exists("wget") {
+        Command::new("wget")
+            .args(&["-O", &install_script_path.to_string_lossy(), url])
+            .status()?
+            .success()
+    } else {
+        return Err("Neither curl nor wget found. Please install one of them.".into());
+    };
+
+    if !download_success {
+        return Err("Failed to download installation script".into());
+    }
+
+    // Make executable on Unix systems
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let mut perms = std::fs::metadata(&install_script_path)?.permissions();
+        perms.set_mode(0o755);
+        std::fs::set_permissions(&install_script_path, perms)?;
+    }
+
+    // Run the installer
+    let status = Command::new("bash")
+        .arg(&install_script_path)
+        .status()?;
+
+    if !status.success() {
+        return Err(format!("Installation script failed with exit code: {}",
+                          status.code().unwrap_or(-1)).into());
+    }
+
+    Ok(())
+}
+
+fn command_exists(cmd: &str) -> bool {
+    Command::new(cmd)
+        .arg("--version")
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .status()
+        .map(|s| s.success())
+        .unwrap_or(false)
 }
 
 fn detect_platform() -> String {
@@ -87,7 +94,6 @@ fn detect_platform() -> String {
         _ => env::consts::OS.to_string(),
     }
 }
-
 
 fn show_manual_installation() {
     eprintln!("🔧 Use one-click installer:");
