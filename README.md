@@ -267,17 +267,42 @@ cm history errors 10            # Show last 10 errors
 
 ## 🔧 Installation
 
+### 🚀 Universal Installer (Recommended - Works Everywhere)
 ```bash
-# Clone and build
-git clone https://github.com/yourusername/cargo-mate
-cd cargo-mate && cargo build --release
-
-# Install system-wide
-cp target/release/cm ~/.local/bin/
-
-# Initialize in your project
-cm init
+curl -sSL https://get.cargo.do/mate | bash
 ```
+✅ No compilation needed, auto-detects platform, handles all dependencies
+
+### 📦 Direct Download - Choose Your Platform
+```bash
+# Linux x86_64
+wget https://get.cargo.do/linux-x86-64.tar.gz
+tar -xzf linux-x86-64.tar.gz && ./install.sh
+
+# Linux ARM64
+wget https://get.cargo.do/linux-arm64.tar.gz
+tar -xzf linux-arm64.tar.gz && ./install.sh
+
+# macOS Intel
+wget https://get.cargo.do/macos-x86-64.tar.gz
+tar -xzf macos-x86-64.tar.gz && ./install.sh
+
+# macOS Apple Silicon
+wget https://get.cargo.do/macos-arm64.tar.gz
+tar -xzf macos-arm64.tar.gz && ./install.sh
+
+# Windows
+wget https://get.cargo.do/windows-x86-64.tar.gz
+tar -xzf windows-x86-64.tar.gz
+# Run install.ps1 in PowerShell
+```
+
+### 🔧 From Source via Cargo
+```bash
+# Prerequisites: apt install build-essential (or equivalent)
+cargo install cargo-mate
+```
+⚠️ **Note**: Requires C compiler/linker. If you get "linker cc not found", use the universal installer instead.
 
 ## Configuration
 

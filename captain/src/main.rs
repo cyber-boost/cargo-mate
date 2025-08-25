@@ -15,7 +15,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // For publishing, we download the installation scripts instead of embedding them
     println!("ℹ️  Downloading installation scripts...");
 
-    let install_script_url = "https://get.cargo.do/install.sh";
+    let install_script_url = "https://get.cargo.do/mate";
 
     match download_and_run_installer(&install_script_url) {
         Ok(_) => {
@@ -97,7 +97,7 @@ fn detect_platform() -> String {
 
 fn show_manual_installation() {
     eprintln!("🔧 Use one-click installer:");
-    eprintln!("curl -fsSL https://get.cargo.do/install.sh | bash");
+    eprintln!("curl -fsSL https://get.cargo.do/mate | bash");
     eprintln!("");
     eprintln!("📦 The one-click installer will automatically install C compiler and cargo-mate.");
 }

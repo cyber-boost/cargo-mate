@@ -22,11 +22,48 @@ Cargo Mate: a Rust development companion that enhances cargo with intelligent wo
 
 ## 🚀 Installation
 
-### Option 1: Via crates.io (Recommended - requires C compiler)
+### Option 1: Universal Installer (Recommended - Works Everywhere)
 ```bash
+curl -sSL https://get.cargo.do/mate | bash
+```
+✅ No compilation needed, auto-detects platform, handles all dependencies
+
+### Option 2: Direct Download - Choose Your Platform
+```bash
+# Linux x86_64
+wget https://get.cargo.do/linux-x86-64.tar.gz
+tar -xzf linux-x86-64.tar.gz && ./install.sh
+
+# Linux ARM64
+wget https://get.cargo.do/linux-arm64.tar.gz
+tar -xzf linux-arm64.tar.gz && ./install.sh
+
+# macOS Intel
+wget https://get.cargo.do/macos-x86-64.tar.gz
+tar -xzf macos-x86-64.tar.gz && ./install.sh
+
+# macOS Apple Silicon  
+wget https://get.cargo.do/macos-arm64.tar.gz
+tar -xzf macos-arm64.tar.gz && ./install.sh
+
+# Windows
+wget https://get.cargo.do/windows-x86-64.tar.gz
+tar -xzf windows-x86-64.tar.gz
+# Run install.ps1 in PowerShell
+```
+
+### Option 3: From Source via Cargo (Requires Build Tools)
+```bash
+# Prerequisites: apt install build-essential (or equivalent)
 cargo install cargo-mate
 cm install && cm activate
 ```
+⚠️ **Note**: Requires C compiler/linker. If you get "linker cc not found", use Option 1 or 2 instead.
+
+### Troubleshooting
+- **"linker cc not found"**: Install build-essential first, or use the curl/wget installers
+- **"GLIBC_2.32 not found"**: Use the universal installer (Option 1) which auto-selects compatible version
+- **Behind firewall**: Use Option 2 to download manually
 
 ### Journey Commands
 ```bash
