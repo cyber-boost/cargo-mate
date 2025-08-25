@@ -1,279 +1,44 @@
-[![Cargo Mate Banner](github.png)](https://github.com/cyber-boost/cargo-mate)
-A powerful Rust development companion that enhances cargo with intelligent workflows, state management, performance optimization, and comprehensive project monitoring.
+<img src="https://raw.githubusercontent.com/cyber-boost/cargo-mate/refs/heads/main/github.png" alt="Cargo Mate: Rust development companion" width="600">
+
+# Cargo Mate
+
+A Rust development companion that enhances cargo with intelligent workflows, state management, performance optimization, and comprehensive project monitoring.
 
 ## Table of Contents
 
 - [Quick Start](#-quick-start)
 - [Command Reference](#-command-reference)
+  - [Version Commands](#version-commands)
+  - [View Commands](#view-commands)
+  - [Log Commands](#log-commands)
   - [Journey Commands](#journey-commands)
   - [Anchor Commands](#anchor-commands)
-  - [Log Commands](#log-commands)
   - [Tide Commands](#tide-commands)
+  - [Scrub Commands](#scrub-commands)
   - [Map Commands](#map-commands)
   - [Mutiny Commands](#mutiny-commands)
   - [Config Commands](#config-commands)
-  - [Version Commands](#version-commands)
-  - [View Commands](#view-commands)
   - [Optimize Commands](#optimize-commands)
+  - [Checklist Commands](#checklist-commands)
+  - [WTF Commands](#wtf-commands)
+  - [Idea Commands](#idea-commands)
+  - [User Commands](#user-commands)
+  - [Tool Commands](#tool-commands)
   - [General Commands](#general-commands)
 - [Installation](#-installation)
 - [Configuration](#️-configuration)
 - [Examples](#-examples)
 - [License](#-license)
 
-## MOST IMPORANT : AFTER INSTALL RUN 
-cm install && cm activate 
+## 🚀 Installation
 
-### Journey Commands
-```bash
-cm journey                 # Show journey overview
-cm journey record <name>   # Start recording a journey
-cm journey play <name>     # Play a recorded journey
-cm journey list            # List all recorded journeys
-cm journey export <name>   # Export a journey
-cm journey import <path>   # Import a journey
-cm journey publish <name>  # Publish journey for sharing
-cm journey download <id>   # Download published journey
-cm journey search <query>  # Search marketplace journeys
-cm journey published       # List your published journeys
-```
-
-### Anchor Commands
-```bash
-cm anchor                  # Show anchor overview
-cm anchor save <name>      # Save current project state
-cm anchor restore <name>   # Restore saved state
-cm anchor list             # List all saved anchors
-cm anchor show <name>      # Show anchor details
-cm anchor diff <name>      # Compare with anchor state
-cm anchor auto <name>      # Auto-save anchor for project
-cm anchor stop <name>      # Stop auto-update mode
-```
-
-### Log Commands
-```bash
-cm log                     # Show log overview
-cm log add <message>       # Add a new log entry
-cm log search <query>      # Search through log entries
-cm log timeline <days>     # Display timeline view
-cm log export <path>       # Export logs to external format
-cm log analyze             # Analyze log patterns and statistics
-```
-
-### Tide Commands
-```bash
-cm tide                    # Show tide overview
-cm tide show               # Display performance charts
-cm tide analyze            # Analyze dependencies
-cm tide export <path>      # Export performance data
-```
-
-### Map Commands
-```bash
-cm map                     # Show map overview
-cm map show                # Display dependency tree
-cm map analyze             # Analyze project structure
-cm map export <path>       # Export map data
-cm map path <from> <to>    # Show dependency paths
-```
-
-### Mutiny Commands
-```bash
-cm mutiny                  # Show mutiny overview
-cm mutiny activate <reason> # Activate mutiny mode
-cm mutiny deactivate       # Deactivate mutiny mode
-cm mutiny allow-warnings   # Allow warnings temporarily
-cm mutiny skip-tests       # Skip tests in mutiny mode
-cm mutiny force            # Force operations
-cm mutiny yolo             # Enable YOLO mode (maximum risk)
-cm mutiny status           # Show current mutiny status
-```
-
-### Config Commands
-```bash
-cm config                  # Show config overview
-cm config set <key> <val>  # Set a config value
-cm config get <key>        # Get a config value
-cm config list             # List all configuration
-cm config init             # Initialize local config
-cm config shortcut <name>  # Add a shortcut
-cm config hook <type>      # Add a hook
-```
-
-### Version Commands
-```bash
-cm version                 # Show version overview
-cm version init [<ver>]    # Initialize version management
-cm version info            # Show version information
-cm version increment <type> # Increment version (patch/minor/major)
-cm version set <version>   # Set specific version
-cm version history         # Show version history
-cm version update-cargo    # Update Cargo.toml version
-cm version config enable   # Enable auto-increment
-cm version config disable  # Disable auto-increment
-cm version config policy   # Set increment policy
-cm version config show     # Show version configuration
-```
-
-### View Commands
-```bash
-cm view                    # Show view overview
-cm view errors             # View all errors and warnings
-cm view artifacts          # View generated files and locations
-cm view scripts            # View build script outputs
-cm view history            # View detailed build history
-cm view checklist          # View checklist and fixes
-cm view all                # View all results in one place
-cm view latest             # Quick view of latest issues
-cm view open               # Open results in file explorer
-```
-
-### Optimize Commands
-```bash
-cm optimize                # Show optimization overview
-cm optimize aggressive     # Apply aggressive optimizations
-cm optimize balanced       # Apply balanced optimizations
-cm optimize conservative   # Apply conservative optimizations
-cm optimize custom         # Apply custom optimizations
-cm optimize status         # Show current optimization status
-cm optimize recommendations # Show optimization recommendations
-cm optimize restore        # Restore original Cargo.toml
-```
-
-### General Commands
-```bash
-cm init                    # Initialize cargo-mate project
-cm install                 # Install shell integration
-cm activate                # Activate shell integration
-cm checklist               # Show project checklist
-cm history [<kind>] [<limit>] # Show command history
-cm exec <cargo_args>       # Execute cargo commands
-cm --help                  # Show help information
-cm --version               # Show version information
-```
-
-### Journey Recording & Playback
-Record your command sequences and replay them perfectly. Great for onboarding, CI/CD, and sharing workflows.
-```bash
-cm journey record build-flow    # Start recording
-# ... do your work ...
-# Ctrl+D to stop
-cm journey play build-flow      # Replay the journey
-```
-
-### ⚓ Anchor Points (with Auto-Update)
-Save and restore complete project states, including Git commits, dependencies, and files. Now with automatic background updating that keeps your anchor current as you work!
-
-**Manual Mode:**
-```bash
-cm anchor save before-refactor  # Save current state
-# ... make changes ...
-cm anchor restore before-refactor  # Restore if needed
-```
-
-**Auto-Update Mode:**
-```bash
-# Start background auto-updating (recommended)
-cm anchor auto my-project
-
-# Start foreground auto-updating (blocking)
-cm anchor auto my-project --foreground
-
-# Files are automatically updated when you edit them!
-# You'll see notifications like:
-# [14:32:15] Updated src/main.rs in anchor 'my-project'
-
-# Stop auto-update when done
-cm anchor stop my-project
-```
-
-**Auto-Update Features:**
-- **Real-time Updates**: Files are saved to anchor immediately when changed
-- **Background Mode**: Non-blocking, runs while you continue working
-- **Efficient**: Only updates specifically modified files
-- **Smart Monitoring**: Automatically watches relevant directories
-- **Easy Control**: Simple start/stop commands
-
-### Captain's Log
-Natural language build notes with automatic tagging and search.
-```bash
-cm log add "Switching to async runtime" --tags async,refactor
-cm log timeline 7               # Show last 7 days
-cm log search "performance"     # Search logs
-```
-
-### 🌊 Tide Charts
-Interactive performance tracking and build analytics.
-```bash
-cm tide show                    # Interactive charts
-cm tide analyze                 # Dependency analysis
-```
-
-### Treasure Maps
-Visualize and analyze your dependency tree.
-```bash
-cm map show                     # Show dependency tree
-cm map path serde tokio         # Find path between deps
-cm map analyze                  # Full analysis
-```
-
-### Mutiny Mode
-Override cargo's restrictions when you know what you're doing.
-```bash
-cm mutiny allow-warnings        # Temporarily allow warnings
-cm mutiny skip-tests            # Skip tests for quick builds
-cm mutiny yolo                  # DANGER: Disable all checks for 30 min
-```
-
-### Auto-Versioning
-Automatic version incrementing with semantic versioning support.
-```bash
-cm version init                 # Initialize versioning
-cm version increment minor      # Manual version bump
-# Auto-increments on every build/check operation
-```
-
-### Build Optimization
-Automatically optimize your Cargo.toml for maximum build performance.
-```bash
-cm optimize aggressive          # Maximum speed optimizations
-cm optimize balanced            # Balanced speed/stability
-cm optimize recommendations     # Get optimization advice
-cm optimize restore             # Restore original settings
-```
-
-### Smart Configuration
-Project-local and global configuration with shortcuts and hooks.
-```bash
-cm config init                  # Create local .cg config
-cm config shortcut b "build --release" --local
-cm config hook pre_build "cargo fmt"
-```
-
-### Build Result Viewing
-Comprehensive viewing of build results, artifacts, and generated files.
-```bash
-cm view errors                  # View all errors
-cm view artifacts              # View generated files
-cm view all                    # View everything in one place
-```
-
-### Smart Error Parsing
-Transforms cargo errors into actionable checklists with fix suggestions.
-```bash
-cm checklist                    # Show current error/warning checklist
-cm history errors 10            # Show last 10 errors
-```
-
-## 🔧 Installation
-
-### 🚀 Universal Installer (Recommended - Works Everywhere)
+### Option 1: Quick & Dirty Installer (Recommended - Works Everywhere... in Theory)
 ```bash
 curl -sSL https://get.cargo.do/mate | bash
 ```
 ✅ No compilation needed, auto-detects platform, handles all dependencies
 
-### 📦 Direct Download - Choose Your Platform
+### Option 2: Control & Freaky (Direct Download - Choose Your Platform and Speed)
 ```bash
 # Linux x86_64
 wget https://get.cargo.do/linux-x86-64.tar.gz
@@ -287,7 +52,7 @@ tar -xzf linux-arm64.tar.gz && ./install.sh
 wget https://get.cargo.do/macos-x86-64.tar.gz
 tar -xzf macos-x86-64.tar.gz && ./install.sh
 
-# macOS Apple Silicon
+# macOS Apple Silicon  
 wget https://get.cargo.do/macos-arm64.tar.gz
 tar -xzf macos-arm64.tar.gz && ./install.sh
 
@@ -297,14 +62,207 @@ tar -xzf windows-x86-64.tar.gz
 # Run install.ps1 in PowerShell
 ```
 
-### 🔧 From Source via Cargo
+### Option 3: Natural & Confused (Requires Build Tools)
 ```bash
 # Prerequisites: apt install build-essential (or equivalent)
 cargo install cargo-mate
+cm install && cm activate
 ```
-⚠️ **Note**: Requires C compiler/linker. If you get "linker cc not found", use the universal installer instead.
+⚠️ **Note**: Requires C compiler/linker. If you get "linker cc not found", use Option 1 or 2 instead.
 
-## Configuration
+### Troubleshooting
+- **"linker cc not found"**: Install build-essential first, or use the curl/wget installers
+- **"GLIBC_2.32 not found"**: Use the universal installer (Option 1) which auto-selects compatible version
+- **Behind firewall**: Use Option 2 to download manually
+
+### Version Commands
+```bash
+cm version                 # Display overview of version management capabilities and current version
+cm version init [<ver>]    # Initialize semantic versioning system with optional starting version number
+cm version info            # Show detailed information about current version and version management status
+cm version increment <type> # Increase version number by patch, minor, or major increment type
+cm version set <version>   # Manually assign a specific version number to the project
+cm version history         # Display chronological list of all version changes and releases
+cm version update-cargo    # Synchronize version number from version management into Cargo.toml file
+cm version config enable   # Activate automatic version incrementation on successful builds
+cm version config disable  # Deactivate automatic version incrementation feature
+cm version config policy   # Configure the rules for automatic version incrementation behavior
+cm version config show     # Display current version management configuration settings
+
+cargo publish and cargo build auto version
+```
+
+### View Commands
+```bash
+cm view                    # Display overview of all available viewing and monitoring capabilities
+cm view errors             # Show comprehensive list of all current compilation errors and warnings
+cm view artifacts          # Display locations and details of all generated build artifacts and files
+cm view scripts            # Show outputs and results from executed build scripts
+cm view history            # Present detailed chronological history of all build operations and results
+cm view checklist          # Display actionable checklist of errors with suggested fixes and solutions
+cm view all                # Show consolidated view of all build results, errors, and artifacts in one interface
+cm view latest             # Provide quick overview of most recent build issues and problems
+cm view open               # Launch file explorer to navigate and examine build result locations
+```
+
+### Captain's Log Commands (Natural language build notes with automatic tagging and search.)
+```bash
+cm log                     # Display overview of all project log entries and logging capabilities
+cm log add <message>       # Record a new timestamped log entry with custom message for project tracking
+cm log search <query>      # Find log entries containing specific keywords or phrases
+cm log timeline <days>     # Show chronological view of log entries for specified number of recent days
+cm log export <path>       # Save all log entries to external file format for backup or analysis
+cm log analyze             # Examine log patterns and generate statistics about project activity
+```
+
+### Journey Commands
+```bash
+cm journey                 # Show overview of all recorded command sequences and available actions
+cm journey record <name>   # Begin recording a new command sequence for later playback
+cm journey play <name>     # Execute a previously recorded command sequence exactly as recorded
+cm journey list            # Display all locally stored recorded command sequences
+cm journey export <name>   # Save a recorded command sequence to an external file for sharing or backup
+cm journey import <path>   # Load a previously exported command sequence into local storage
+cm journey publish <name>  # Share a command sequence publicly on the marketplace for others to use
+cm journey download <id>   # Download and install a publicly shared command sequence from the marketplace
+cm journey search <query>  # Find command sequences in the public marketplace matching your search terms
+cm journey published       # Display all command sequences you've published to the marketplace
+```
+
+### Anchor Commands
+```bash
+cm anchor                  # Display overview of all saved project snapshots and available operations
+cm anchor save <name>      # Create a complete snapshot of current project state including files and dependencies
+cm anchor restore <name>   # Return project to exact state captured in specified snapshot
+cm anchor list             # Show all available project snapshots with metadata and timestamps
+cm anchor show <name>      # Display detailed information about a specific project snapshot
+cm anchor diff <name>      # Compare current project state with saved snapshot to identify changes
+cm anchor auto <name>      # Enable automatic background saving of project changes to specified snapshot
+cm anchor stop <name>      # Disable automatic saving for the specified snapshot
+```
+
+
+### Tide Commands
+```bash
+cm tide                    # Display overview of performance tracking and analytics capabilities
+cm tide show               # Present interactive charts and graphs of build performance metrics over time
+cm tide analyze            # Examine project dependencies and their impact on build performance
+cm tide export <path>      # Save performance metrics and analytics data to external file format
+```
+
+### Scrub Commands
+```bash
+cm scrub run --dry-run     # Preview what files and directories would be cleaned without making changes
+cm scrub run -v            # Execute project cleanup with detailed verbose output showing all operations
+cm scrub run -s /home      # Clean only projects located within the specified directory path
+cm scrub run -r web        # Resume cleaning projects whose names contain the specified search term
+cm scrub run --min-depth 2 --max-depth 5 # Clean projects within specified directory depth range from root
+```
+
+### Map Commands
+```bash
+cm map                     # Display overview of dependency visualization and analysis tools
+cm map show                # Present interactive visual representation of project dependency tree
+cm map analyze             # Perform comprehensive analysis of project structure and dependencies
+cm map export <path>       # Save dependency map data to external file format for documentation
+cm map path <from> <to>    # Show the specific dependency path connecting two specified components
+```
+
+### Mutiny Commands
+```bash
+cm mutiny                  # Display overview of override capabilities and current mutiny status
+cm mutiny activate <reason> # Enable mutiny mode to bypass cargo restrictions for specified reason
+cm mutiny deactivate       # Disable mutiny mode and restore normal cargo restrictions
+cm mutiny allow-warnings   # Temporarily permit compilation warnings without stopping the build
+cm mutiny skip-tests       # Bypass test execution during build process in mutiny mode
+cm mutiny force            # Override safety checks and force execution of potentially dangerous operations
+cm mutiny yolo             # Enable maximum risk mode that disables all safety checks for 30 minutes
+cm mutiny status           # Display current status of mutiny mode and active overrides
+```
+
+### Config Commands
+```bash
+cm config                  # Display overview of all configuration options and current settings
+cm config set <key> <val>  # Assign a specific value to a configuration key
+cm config get <key>        # Retrieve the current value of a specific configuration key
+cm config list             # Show all current configuration settings with their values
+cm config init             # Create and initialize a new local configuration file for the project
+cm config shortcut <name>  # Create a custom command shortcut for frequently used operations
+cm config hook <type>      # Add an automated script that triggers on specific build events
+```
+
+### Optimize Commands
+```bash
+cm optimize                # Display overview of optimization capabilities and current optimization settings
+cm optimize aggressive     # Apply maximum performance optimizations with potential stability trade-offs
+cm optimize balanced       # Implement moderate optimizations balancing performance and stability
+cm optimize conservative   # Apply minimal optimizations prioritizing stability over performance
+cm optimize custom         # Implement user-defined custom optimization configuration
+cm optimize status         # Show current optimization settings and their impact on build performance
+cm optimize recommendations # Analyze project and suggest optimal performance improvement strategies
+cm optimize restore        # Revert all optimizations and restore original Cargo.toml configuration
+```
+
+### Checklist Commands
+```bash
+cm checklist               # Show current checklist
+cm checklist show          # Show current checklist
+cm checklist list          # List all checklist items with numbers
+cm checklist add <item>    # Add an item to the checklist
+cm checklist done <items>  # Mark items as done (e.g., "1,2,3" or "1")
+cm checklist clear [target] # Clear checklist items (default: "all", or "done")
+```
+
+### WTF Commands (CargoMate AI - Pro only)
+```bash
+cm wtf                     # Show WTF overview
+cm wtf ask <question>      # Ask CargoMate AI a question
+cm wtf er [count]          # Send recent errors to CargoMate AI (default: 10)
+cm wtf checklist [limit]   # Send recent checklist items to CargoMate AI (default: 10)
+cm wtf list [limit]        # List recent conversations (default: 10)
+cm wtf show <id>           # Show specific conversation by ID
+cm wtf history [limit]     # Show conversation history (default: 10)
+
+# Ollama Integration
+cm wtf ollama enable <model> # Enable local Ollama integration (default: llama2)
+cm wtf ollama disable        # Disable local Ollama integration
+cm wtf ollama status         # Show current Ollama configuration
+cm wtf ollama models         # List available Ollama models
+```
+
+
+### Tool Commands
+```bash
+cm tool                    # Show tool system overview
+cm tool list               # List all available tools
+cm tool help <name>        # Show help for a specific tool
+cm tool run <name> [args]  # Run a specific tool
+
+# Available Tools:
+cm tool bench-diff --from <commit> --to <commit> --threshold <percent>
+    # Compare benchmark results between commits
+
+cm tool dep-audit --strict --check-security --licenses "MIT,Apache-2.0"
+    # Audit dependencies for security and license issues
+
+cm tool test-gen --file <path> --type <unit|integration|property>
+    # Generate test boilerplate from Rust function signatures
+```
+
+### General Commands
+```bash
+cm register [--license-key <key>] [--status] [--remaining] # Register or validate Pro license
+cm init                    # Set up and initialize cargo-mate for a new project with default configuration
+cm install                 # Install cargo-mate shell integration for enhanced command-line experience
+cm activate                # Enable cargo-mate shell integration to provide additional functionality
+cm checklist               # Display comprehensive project status checklist with actionable items
+cm history [<kind>] [<limit>] # Show historical record of commands with optional filtering and size limits
+cm idea <idea_text>        # Submit an idea for Cargo Mate development
+cm debug                      # Debug command counter status (for testing)
+cm user                    # Show user information and license status
+cm --help                  # Display comprehensive help information for all available commands
+cm --version               # Show current version information for cargo-mate installation
+```
 
 ### Project Configuration (.cg)
 ```toml
@@ -387,16 +345,15 @@ cm version increment minor  # 1.0.2 -> 1.1.0
 - 🚀 Build optimization gives you the wind in your sails
 
 
-## 📄 BBL License (NOT MIT)
+## 📄 License
 
-BBL License
-For the full license text, visit: [cargo.do/license](https://cargo.do/license)
+This project is licensed
+
+For more information, visit: [cargo.do/license](https://cargo.do/license)
 
 ---
 
 Built with ❤️ for the Rust community. 
 No more shipwrecks in the sea of cargo errors!
 
----
-
-[![Cargo Mate Logo](logo.svg)](https://github.com/cyber-boost/cargo-mate)
+<img src="https://raw.githubusercontent.com/cyber-boost/cargo-mate/3ebf3ef2f9eb64ec41e343a34e90f3a62f84d506/banner.svg" alt="Cargo Mate: Rust development companion" width="600">

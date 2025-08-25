@@ -88,32 +88,8 @@ cm version config enable   # Activate automatic version incrementation on succes
 cm version config disable  # Deactivate automatic version incrementation feature
 cm version config policy   # Configure the rules for automatic version incrementation behavior
 cm version config show     # Display current version management configuration settings
-```
 
-**🚀 Smart Publish Handling:**
-When using `cargo publish`, cargo-mate automatically adds the `--allow-dirty` flag to handle version auto-increments:
-```bash
-cargo publish   # Automatically becomes: cargo publish --allow-dirty
-```
-
-**How it works:**
-1. You run `cargo publish`
-2. Cargo-mate auto-increments your version (modifies Cargo.toml)
-3. Repository becomes "dirty" (uncommitted changes)
-4. `cargo publish` would normally fail with "dirty repo" error
-5. Cargo-mate detects this and adds `--allow-dirty` automatically
-6. Command succeeds: `cargo publish --allow-dirty`
-
-**Example workflow:**
-```bash
-# Before: This would fail due to auto-versioning
-cargo publish
-# ❌ Error: repository has uncommitted changes
-
-# After: Works seamlessly with auto --allow-dirty
-cargo publish
-# ✅ Auto-added --allow-dirty flag for publish command
-# ✅ Successfully published!
+cargo publish and cargo build auto version
 ```
 
 ### View Commands
