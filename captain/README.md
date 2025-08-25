@@ -1,4 +1,8 @@
-Cargo Mate: a Rust development companion that enhances cargo with intelligent workflows, state management, performance optimization, and comprehensive project monitoring.
+<img src="https://raw.githubusercontent.com/cyber-boost/cargo-mate/refs/heads/main/github.png" alt="Cargo Mate: Rust development companion" width="600">
+
+# Cargo Mate
+
+A Rust development companion that enhances cargo with intelligent workflows, state management, performance optimization, and comprehensive project monitoring.
 
 ## Table of Contents
 
@@ -409,3 +413,7 @@ For more information, visit: [cargo.do/license](https://cargo.do/license)
 
 Built with ❤️ for the Rust community. 
 No more shipwrecks in the sea of cargo errors!
+
+<img src="https://raw.githubusercontent.com/cyber-boost/cargo-mate/3ebf3ef2f9eb64ec41e343a34e90f3a62f84d506/banner.svg" alt="Cargo Mate: Rust development companion" width="600">
+
+

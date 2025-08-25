@@ -1,4 +1,4 @@
-[![Cargo Mate Logo](logo.svg)](https://github.com/cyber-boost/cargo-mate)
+[![Cargo Mate Banner](github.png)](https://github.com/cyber-boost/cargo-mate)
 A powerful Rust development companion that enhances cargo with intelligent workflows, state management, performance optimization, and comprehensive project monitoring.
 
 ## Table of Contents
@@ -396,3 +396,7 @@ For the full license text, visit: [cargo.do/license](https://cargo.do/license)
 
 Built with ❤️ for the Rust community. 
 No more shipwrecks in the sea of cargo errors!
+
+---
+
+[![Cargo Mate Logo](logo.svg)](https://github.com/cyber-boost/cargo-mate)
