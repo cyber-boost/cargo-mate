@@ -1,6 +1,6 @@
 [package]
 name = "cargo-mate"
-version = "1.0.96"
+version = "1.1.6"
 edition = "2021"
 rust-version = "1.70"
 authors = ["Cargo Mate <mate@cargo.do>"]
@@ -35,7 +35,29 @@ exclude = [
 name = "cm"
 path = "src/main.rs"
 
-# This crate compiles with zero system dependencies - no C compiler required!
+
+[package.metadata.binstall]
+pkg-url = "https://get.cargo.do/dist/{ name }-{ target }.tar.gz"
+pkg-fmt = "tgz"
+bin-dir = "{ bin }{ binary-ext }"
+
+[package.metadata.binstall.overrides.x86_64-unknown-linux-gnu]
+pkg-url = "https://get.cargo.do/dist/cargo-mate-linux-x86_64.tar.gz"
+
+[package.metadata.binstall.overrides.x86_64-unknown-linux-musl]
+pkg-url = "https://get.cargo.do/dist/cargo-mate-static-linux-x86_64.tar.gz"
+
+[package.metadata.binstall.overrides.aarch64-unknown-linux-gnu]
+pkg-url = "https://get.cargo.do/dist/cargo-mate-linux-aarch64.tar.gz"
+
+[package.metadata.binstall.overrides.x86_64-apple-darwin]
+pkg-url = "https://get.cargo.do/dist/cargo-mate-macos-x86_64.tar.gz"
+
+[package.metadata.binstall.overrides.aarch64-apple-darwin]
+pkg-url = "https://get.cargo.do/dist/cargo-mate-macos-aarch64.tar.gz"
+
+[package.metadata.binstall.overrides.x86_64-pc-windows-msvc]
+pkg-url = "https://get.cargo.do/dist/cargo-mate-windows-x86_64.tar.gz"
 
 [badges]
 maintenance = { status = "actively-developed" }  # or "passively-maintained", "as-is", "experimental", "looking-for-maintainer", "deprecated", "none"
