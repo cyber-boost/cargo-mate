@@ -1,4 +1,4 @@
-## [2.3.3] - 08/26/2025
+## [1.7.3] - 08/26/2025
 
 ### Added
 
@@ -164,3 +164,18 @@ If you want real protection, use a server API for sensitive logic. The scat and 
 - "Military-grade" encryption (whatever that means)
 - A tool that makes your code both unreadable AND functional
 
+---
+
+---
+
+### [1.7.4] -  08/29/2025
+
+#### Bug Fixes
+- **strip command bug fixed** - Resolved an issue where the `strip` command failed on certain binaries and produced incomplete output. The command now reliably strips symbols across all supported platforms.
+
+- **Manual install nginx issues resolved** - Fixed problems with the manual installation process that caused Nginx configuration errors. The installer now correctly detects and configures Nginx, ensuring smooth integration and no service interruptions.
+
+#### Documentation
+- **Outdated README replaced** - Updated the README with accurate installation, usage, and troubleshooting instructions reflecting the latest features and workflows.
+
+---

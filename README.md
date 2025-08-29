@@ -24,6 +24,8 @@ A Rust development companion that enhances cargo with intelligent workflows, sta
   - [Idea Commands](#idea-commands)
   - [User Commands](#user-commands)
   - [Tool Commands](#tool-commands)
+  - [SCAT Commands](#scat-commands-source-code-obfuscation-tool)
+  - [Strip Commands](#strip-commands-code-cleaning--optimization)
   - [General Commands](#general-commands)
 - [Installation](#-installation)
 - [Configuration](#️-configuration)
@@ -40,27 +42,59 @@ curl -sSL https://get.cargo.do/mate | bash
 
 ### Option 2: Control & Freaky (Direct Download - Choose Your Platform and Speed)
 ```bash
-# Linux x86_64
-wget https://get.cargo.do/linux-x86-64.tar.gz
-tar -xzf linux-x86-64.tar.gz && ./install.sh
+# Linux x86_64 (glibc)
+wget https://get.cargo.do/linux-x86-64.tar.gz -O cargo-mate-linux-x86-64.tar.gz
+tar -xzf cargo-mate-linux-x86-64.tar.gz
+cd cargo-mate-linux-x86_64
+sudo ./install.sh
 
-# Linux ARM64
-wget https://get.cargo.do/linux-arm64.tar.gz
-tar -xzf linux-arm64.tar.gz && ./install.sh
+# Linux x86_64 (musl)
+wget https://get.cargo.do/linux-x86-64-musl.tar.gz -O cargo-mate-linux-x86-64-musl.tar.gz
+tar -xzf cargo-mate-linux-x86-64-musl.tar.gz
+cd cargo-mate-linux-x86_64-musl
+sudo ./install.sh
 
-# macOS Intel
-wget https://get.cargo.do/macos-x86-64.tar.gz
-tar -xzf macos-x86-64.tar.gz && ./install.sh
+# Linux ARM64 (glibc)
+wget https://get.cargo.do/linux-arm64.tar.gz -O cargo-mate-linux-arm64.tar.gz
+tar -xzf cargo-mate-linux-arm64.tar.gz
+cd cargo-mate-linux-aarch64
+sudo ./install.sh
 
-# macOS Apple Silicon  
-wget https://get.cargo.do/macos-arm64.tar.gz
-tar -xzf macos-arm64.tar.gz && ./install.sh
+# Linux ARM64 (musl)
+wget https://get.cargo.do/linux-arm64-musl.tar.gz -O cargo-mate-linux-arm64-musl.tar.gz
+tar -xzf cargo-mate-linux-arm64-musl.tar.gz
+cd cargo-mate-linux-aarch64-musl
+sudo ./install.sh
 
-# Windows
-wget https://get.cargo.do/windows-x86-64.tar.gz
-tar -xzf windows-x86-64.tar.gz
-# Run install.ps1 in PowerShell
-```
+# macOS Intel (x86_64)
+wget https://get.cargo.do/macos-x86-64.tar.gz -O cargo-mate-macos-x86-64.tar.gz
+tar -xzf cargo-mate-macos-x86-64.tar.gz
+cd cargo-mate-macos-x86_64
+sudo ./install.sh
+
+# macOS Apple Silicon (ARM64)
+wget https://get.cargo.do/macos-arm64.tar.gz -O cargo-mate-macos-arm64.tar.gz
+tar -xzf cargo-mate-macos-arm64.tar.gz
+cd cargo-mate-macos-aarch64
+sudo ./install.sh
+
+# Windows x86_64
+wget https://get.cargo.do/windows-x86-64.tar.gz -O cargo-mate-windows-x86-64.tar.gz
+tar -xzf cargo-mate-windows-x86-64.tar.gz
+cd cargo-mate-windows-x86_64
+# Run install.ps1 in PowerShell as Administrator
+
+# Windows i686
+wget https://get.cargo.do/windows-i686.tar.gz -O cargo-mate-windows-i686.tar.gz
+tar -xzf cargo-mate-windows-i686.tar.gz
+cd cargo-mate-windows-i686
+# Run install.ps1 in PowerShell as Administrator
+
+# Universal Linux (latest musl, portable)
+wget https://get.cargo.do/latest-musl.tar.gz -O cargo-mate-latest-musl.tar.gz
+tar -xzf cargo-mate-latest-musl.tar.gz
+cd cargo-mate-latest-musl
+sudo ./install.sh
 
 ### Option 3: Natural & Confused (Requires Build Tools)
 ```bash
@@ -68,7 +102,7 @@ tar -xzf windows-x86-64.tar.gz
 cargo install cargo-mate
 cm install && cm activate
 ```
-⚠️ **Note**: Requires C compiler/linker. If you get "linker cc not found", use Option 1 or 2 instead.
+⚠️ **Note**: 20+ minute build time. Requires C compiler/linker. If you get "linker cc not found", use Option 1 or 2 instead.
 
 ### Troubleshooting
 - **"linker cc not found"**: Install build-essential first, or use the curl/wget installers
@@ -247,6 +281,42 @@ cm tool dep-audit --strict --check-security --licenses "MIT,Apache-2.0"
 
 cm tool test-gen --file <path> --type <unit|integration|property>
     # Generate test boilerplate from Rust function signatures
+```
+
+### SCAT Commands (Source Code Obfuscation Tool) STILL UNDER DEVELOPMENT
+```bash
+cm scat                    # Display overview of SCAT obfuscation capabilities
+cm scat names <PATH>       # Obfuscate file/folder names with mapping file
+cm scat code <PATH>        # Obfuscate Rust identifiers while preserving functionality
+cm scat strings <PATH>     # Scramble string literals with encryption key
+cm scat pack <INPUT> <OUTPUT> # Pack files into obfuscated bundle
+cm scat unpack <INPUT> <MAP> # Reverse obfuscation using mapping files
+
+# Examples:
+cm scat names src/ --map name_mapping.json --sequential
+cm scat code src/ --preserve-pub --min-len 3 --map code_mapping.json
+cm scat strings src/ --key "contest_key" --map strings.json
+cm scat pack src/ contest.bundle --compress
+cm scat unpack obfuscated/ name_mapping.json --output original/
+```
+
+### Strip Commands (Code Cleaning & Optimization)
+```bash
+cm strip <INPUT>           # Remove comments and non-essential elements from Rust files
+cm strip --tease           # strips maticulously comments and blank lines by file or directory 
+cm strip <INPUT> -o <FILE> # Strip to output file (defaults to stdout)
+cm strip <INPUT> -r        # Process directory recursively
+cm strip <INPUT> -b        # Remove blank lines
+cm strip <INPUT> -a        # Aggressive mode: maximum stripping
+cm strip <INPUT> --minify  # Minify to single line where possible
+cm strip <INPUT> --strip-attrs # Remove all attributes (#[...])
+cm strip <INPUT> --strip-docs  # Remove documentation comments
+
+# Examples:
+cm strip src/main.rs --output main.stripped.rs
+cm strip src/ -r --aggressive --backup
+cm strip src/ --recursive --strip-docs --minify
+cm strip src/main.rs --force --output src/main.rs
 ```
 
 ### General Commands

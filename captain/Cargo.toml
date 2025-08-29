@@ -10,6 +10,7 @@ repository = "https://github.com/cyber-boost/cargo-mate"
 license = "MIT OR Apache-2.0"
 keywords = ["cargo", "rust", "development", "cli", "build-tools"]
 categories = ["development-tools", "command-line-utilities"]
+exclude = ["target", "releases", "zig-linux-x86_64-0.11.0", "*.sh", "tests", ".git", ".gitignore", "Dockerfile*", ".v", ".cg"]
 
 [[bin]]
 name = "cm"
@@ -18,14 +19,6 @@ path = "src/main.rs"
 [lib]
 name = "cargo_mate"
 
-include = [
-    "src/",
-    "Cargo.toml",
-    "Cross.toml",
-    ".cargo/",
-    "build.rs",
-    "README.md",
-]
 crate-type = ["rlib"]
 
 [dependencies]
