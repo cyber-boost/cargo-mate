@@ -24,6 +24,8 @@ A Rust development companion that enhances cargo with intelligent workflows, sta
   - [Idea Commands](#idea-commands)
   - [User Commands](#user-commands)
   - [Tool Commands](#tool-commands)
+  - [SCAT Commands](#scat-commands-source-code-obfuscation-tool)
+  - [Strip Commands](#strip-commands-code-cleaning--optimization)
   - [General Commands](#general-commands)
 - [Installation](#-installation)
 - [Configuration](#️-configuration)
@@ -249,6 +251,41 @@ cm tool test-gen --file <path> --type <unit|integration|property>
     # Generate test boilerplate from Rust function signatures
 ```
 
+### SCAT Commands (Source Code Obfuscation Tool)
+```bash
+cm scat                    # Display overview of SCAT obfuscation capabilities
+cm scat names <PATH>       # Obfuscate file/folder names with mapping file
+cm scat code <PATH>        # Obfuscate Rust identifiers while preserving functionality
+cm scat strings <PATH>     # Scramble string literals with encryption key
+cm scat pack <INPUT> <OUTPUT> # Pack files into obfuscated bundle
+cm scat unpack <INPUT> <MAP> # Reverse obfuscation using mapping files
+
+# Examples:
+cm scat names src/ --map name_mapping.json --sequential
+cm scat code src/ --preserve-pub --min-len 3 --map code_mapping.json
+cm scat strings src/ --key "contest_key" --map strings.json
+cm scat pack src/ contest.bundle --compress
+cm scat unpack obfuscated/ name_mapping.json --output original/
+```
+
+### Strip Commands (Code Cleaning & Optimization)
+```bash
+cm strip <INPUT>           # Remove comments and non-essential elements from Rust files
+cm strip <INPUT> -o <FILE> # Strip to output file (defaults to stdout)
+cm strip <INPUT> -r        # Process directory recursively
+cm strip <INPUT> -b        # Remove blank lines
+cm strip <INPUT> -a        # Aggressive mode: maximum stripping
+cm strip <INPUT> --minify  # Minify to single line where possible
+cm strip <INPUT> --strip-attrs # Remove all attributes (#[...])
+cm strip <INPUT> --strip-docs  # Remove documentation comments
+
+# Examples:
+cm strip src/main.rs --output main.stripped.rs
+cm strip src/ -r --aggressive --backup
+cm strip src/ --recursive --strip-docs --minify
+cm strip src/main.rs --force --output src/main.rs
+```
+
 ### General Commands
 ```bash
 cm register [--license-key <key>] [--status] [--remaining] # Register or validate Pro license
@@ -357,5 +394,3 @@ Built with ❤️ for the Rust community.
 No more shipwrecks in the sea of cargo errors!
 
 <img src="https://raw.githubusercontent.com/cyber-boost/cargo-mate/3ebf3ef2f9eb64ec41e343a34e90f3a62f84d506/banner.svg" alt="Cargo Mate: Rust development companion" width="600">
-
-

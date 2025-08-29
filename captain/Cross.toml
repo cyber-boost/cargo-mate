@@ -1,0 +1,24 @@
+[target.x86_64-unknown-linux-gnu]
+image = "rustembedded/cross:x86_64-unknown-linux-gnu"
+
+[target.x86_64-unknown-linux-musl]  
+image = "rustembedded/cross:x86_64-unknown-linux-musl"
+
+[target.aarch64-unknown-linux-gnu]
+image = "rustembedded/cross:aarch64-unknown-linux-gnu"
+
+[target.aarch64-unknown-linux-musl]
+image = "rustembedded/cross:aarch64-unknown-linux-musl"
+
+[target.x86_64-pc-windows-gnu]
+image = "rustembedded/cross:x86_64-pc-windows-gnu"
+
+[target.i686-pc-windows-gnu]
+image = "rustembedded/cross:i686-pc-windows-gnu"
+
+# For macOS, we need custom images or osxcross
+[target.x86_64-apple-darwin]
+image = "joseluisq/rust-linux-darwin-builder:latest"
+
+[target.aarch64-apple-darwin]
+image = "joseluisq/rust-linux-darwin-builder:latest"
