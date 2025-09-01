@@ -26,6 +26,8 @@ A Rust development companion that enhances cargo with intelligent workflows, sta
   - [Tool Commands](#tool-commands)
   - [SCAT Commands](#scat-commands-source-code-obfuscation-tool)
   - [Strip Commands](#strip-commands-code-cleaning--optimization)
+  - [Sweep Commands](#sweep-commands-ai-debug-statement-cleanup)
+  - [DDR Commands](#ddr-commands-docker-dock-rust---parallel-build-orchestration--under-development)
   - [General Commands](#general-commands)
 - [Installation](#-installation)
 - [Configuration](#️-configuration)
@@ -185,13 +187,20 @@ cm tide export <path>      # Save performance metrics and analytics data to exte
 ```
 
 ### Scrub Commands
-```bash
-cm scrub run --dry-run     # Preview what files and directories would be cleaned without making changes
-cm scrub run -v            # Execute project cleanup with detailed verbose output showing all operations
-cm scrub run -s /home      # Clean only projects located within the specified directory path
-cm scrub run -r web        # Resume cleaning projects whose names contain the specified search term
-cm scrub run --min-depth 2 --max-depth 5 # Clean projects within specified directory depth range from root
-```
+
+cm scrub run --directory -d <dir>         # Directory to start searching from (default: current)
+cm scrub run --dry-run -n                 # Show what would be cleaned without actually cleaning
+cm scrub run --verbose -v                 # Enable verbose output
+cm scrub run --resume-from -r <string>    # Resume from projects containing this string
+cm scrub run --min-depth <num>            # Minimum directory depth to search
+cm scrub run --max-depth <num>            # Maximum directory depth to search
+cm scrub run --jobs -j <num>              # Number of parallel workers (default: 4)
+cm scrub run --min-size <MB>              # Only show projects larger than this size (MB)
+cm scrub run --sort-by-size -s            # Sort results by size
+cm scrub run --export-json <file>         # Export results to JSON file
+cm scrub run --interactive -i             # Ask before cleaning each project
+cm scrub run --exclude -e <pattern>       # Exclude directories matching patterns (multiple)
+cm scrub run --stats-only                 # Only show statistics without cleaning
 
 ### Map Commands
 ```bash
@@ -317,6 +326,50 @@ cm strip src/main.rs --output main.stripped.rs
 cm strip src/ -r --aggressive --backup
 cm strip src/ --recursive --strip-docs --minify
 cm strip src/main.rs --force --output src/main.rs
+```
+
+### Sweep Commands (AI Debug Statement Cleanup)
+```bash
+cm sweep                    # Display overview of sweep capabilities for cleaning AI debug statements
+cm sweep scan              # Scan for println!, eprintln!, and dbg! statements
+cm sweep sweep [options]   # Clean up debug statements with intelligent pattern recognition
+cm sweep convert           # Convert debug prints to proper logging statements
+cm sweep analyze           # Analyze debug statement patterns and statistics
+cm sweep init              # Initialize sweep configuration file
+
+# Sweep Options:
+cm sweep sweep -n          # Dry run (show what would be removed)
+cm sweep sweep -p          # Interactive mode with pattern memory learning
+cm sweep sweep -y          # Auto-approve all removals
+cm sweep sweep -i          # Interactive confirmation for each statement
+cm sweep sweep --backup    # Create backup files before cleaning
+
+# Examples:
+cm sweep sweep -p          # Learn patterns and clean interactively
+cm sweep sweep -y          # Quick cleanup of all AI debug statements
+cm sweep analyze --top 20  # Show top 20 files with most debug statements
+```
+
+### DDR Commands (Docker Dock Rust - Parallel Build Orchestration) 🚧 UNDER DEVELOPMENT
+```bash
+cm ddr                     # Display overview of DDR parallel Docker-based Rust build capabilities
+cm ddr build [options]     # Build Rust project using Docker containers with parallel orchestration
+cm ddr build --target <target> # Cross-compile for specific target architecture
+cm ddr build --jobs <num>  # Set maximum parallel build jobs (default: 16)
+cm ddr build --image <img> # Use custom Docker image for builds
+cm ddr build --profile <profile> # Build with specific profile (debug/release)
+
+# DDR Build Options:
+cm ddr build -n            # Dry run (show what would be built)
+cm ddr build --verbose     # Verbose output with detailed Docker commands
+cm ddr build --no-cache    # Disable Docker layer caching
+cm ddr build --clean       # Clean build artifacts before building
+cm ddr build --watch       # Watch mode (rebuild on changes)
+
+# Examples:
+cm ddr build --target x86_64-unknown-linux-gnu --target aarch64-unknown-linux-gnu
+cm ddr build --jobs 32 --profile release
+cm ddr build --image rust:1.70 --verbose
 ```
 
 ### General Commands

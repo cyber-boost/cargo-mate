@@ -1,181 +1,104 @@
-## [1.7.3] - 08/26/2025
+# Cargo‑Mate Change Log
 
-### Added
-
-#### Major Captain Module Expansion
-- **Captain binary encryption/decryption system** - Encrypted binaries with automatic decryption
-- **Shell integration enhancements** - Advanced shell detection and configuration
-- **License management system** - Comprehensive licensing with activation/deactivation
-- **Binary encryption tools** - Secure binary packaging and distribution
-- **Security features** - Enhanced security capabilities for captain binaries
-
-#### Core Commands Added
-
-##### `cm journey` - Development Workflow Recording (08/24/2025)
-- Record and replay development sessions
-- Interactive journey recording with checkpoints
-- Command sequence capture and playback
-- Journey templates and sharing capabilities
-- Build process automation and documentation
-
-##### `cm optimize` - Build Performance Optimization (08/24/2025)
-- Aggressive, balanced, and conservative optimization profiles
-- Cargo.toml automatic optimization with backup creation
-- Custom optimization settings (jobs, incremental, opt-level)
-- Build performance recommendations and status reporting
-- Optimization restoration from backups
-
-##### `cm scat` - Source Code Obfuscation Tool (08/24/2025)
-- Rename files/folders to random strings with mapping files
-- Basic identifier renaming (WARNING: Currently breaks code compilation)
-- String literal scrambling with XOR (trivially reversible)
-- Generates mapping files for reversal
-- **Current Status:** Names obfuscation works. Code obfuscation could break your build.
-- **Disclaimer:** If you're using this for "security", you're doing it wrong...
-- **safety** auto backup file does happen, you should always double check the restroom in shipwreck
-
-##### `cm strip` - Comment & Whitespace Removal (08/24/2025)
-- Remove comments and blank lines from Rust source files
-- Aggressive mode (`--aggressive`) for maximum compression
-- Automatic backup creation in `.shipwreck/strip/`
-- Supports single file or recursive directory processing
-- **Note:** Makes your code harder to maintain but doesn't actually protect anything
-
-##### `cm affiliate` - Affiliate Management System (08/24/2025)
-- Generate unique affiliate codes for profit sharing
-- API integration for referral tracking
-- Commission rate management (33% profit sharing model)
-- Local affiliate configuration storage
-- Referral link generation and management
-
-##### `cm version` - Advanced Version Management (08/24/2025)
-- Auto-incrementing version numbers
-- Multiple version formats (semantic, date-based, build numbers)
-- Version policies (patch, minor, major increments)
-- Cargo.toml synchronization
-- Version file management (.v files)
-
-##### `cm anchor` - Project State Management (08/24/2025)
-- Save and restore complete project states
-- Checkpoint creation and management
-- Project snapshot capabilities
-- State comparison and diffing
-
-##### `cm tide` - Performance Tracking (08/24/2025)
-- Build time visualization and analysis
-- Performance metrics collection
-- Trend analysis and reporting
-- Performance bottleneck identification
-
-##### `cm map` - Dependency Visualization (08/24/2025)
-- Project dependency mapping and visualization
-- Cargo dependency graph generation
-- Module relationship analysis
-
-##### `cm mutiny` - Cargo Override System (08/24/2025)
-- Override cargo restrictions and limitations
-- Advanced cargo configuration manipulation
-- Build process customization
-
-##### `cm config` - Configuration Management (08/24/2025)
-- Project-wide configuration management
-- Local vs global configuration options
-- Configuration shortcuts and templates
-
-##### `cm view` - Build Artifact Viewer (08/24/2025)
-- Display build results and artifacts
-- Build output visualization
-- Artifact management and inspection
-
-##### `cm checklist` - Error/Warning Tracking (08/24/2025)
-- Build error and warning checklist management
-- Issue tracking and resolution workflow
-- Quality assurance automation
-
-##### `cm history` - Build History Management (08/24/2025)
-- Comprehensive build history tracking
-- Historical build analysis and reporting
-- Build pattern recognition
-
-##### `cm scrub` - System-wide Cargo Cleaning (08/24/2025)
-- Deep project cleaning capabilities
-- Cache and artifact removal
-- System-wide cargo state reset
-
-##### `cm wtf` - AI Integration (08/24/2025)
-- CargoMate AI question answering (Pro feature)
-- Error analysis and debugging assistance
-- Code review and suggestions
-- Interactive AI development assistant
-- Ollama local AI integration support
-
-##### `cm log` - Advanced Logging (08/24/2025)
-- Captain's log for build notes and documentation
-- Log analysis and reporting
-- Build session tracking
-
-##### `cm tool` - Utility Tools (08/24/2025)
-- Benchmark comparison tools
-- Dependency auditing
-- Test generation utilities
-- Code analysis tools
-
-#### Installation & Integration Features
-- **Enhanced shell integration** - Automatic shell detection and configuration
-- **Captain binary auto-download** - Seamless encrypted binary installation
-- **Platform detection and optimization** - Cross-platform compatibility
-- **Backup and recovery systems** - Safe operations with automatic backups
-
-### Technical Improvements
-
-#### Build System Enhancements
-- **Cross-platform builds** - Support for Linux, macOS, and Windows
-- **Multi-architecture support** - x86_64, ARM64, and i686 architectures
-- **Static binary builds** - Maximum deployment compatibility
-- **Musl libc support** - Universal Linux compatibility
-
-#### Code Quality & Maintenance
-- **Comprehensive error handling** - Robust error reporting and recovery
-- **Configuration management** - Flexible configuration options
-- **Logging and telemetry** - Build process tracking and analysis
-- **Performance optimization** - Fast builds with optimized settings
-
-### Known Issues
-- `scat code` only renames function declarations, not their usage sites (your code won't compile)
-- String "encryption" is just XOR - your nephew could reverse it
-- No actual protection against anyone with 5 minutes and Google
-
-### Developer Notes
-This release represents a major expansion of Cargo Mate's capabilities with the introduction of the Captain system. The captain provides advanced development tools while maintaining the core philosophy of transparent, maintainable code.
-
-The captain system introduces:
-- **Encrypted binary distribution** for premium features
-- **AI integration** for development assistance
-- **Advanced workflow automation** for complex projects
-- **Enterprise-grade tooling** for professional development
-
-If you want real protection, use a server API for sensitive logic. The scat and strip tools are for:
-- Making code less readable for contests/puzzles
-- Satisfying managers who think obfuscation = security
-- Learning why obfuscation in compiled languages is pointless
-
-### Coming Never
-- Actual working code obfuscation (it's harder than it looks)
-- "Military-grade" encryption (whatever that means)
-- A tool that makes your code both unreadable AND functional
+> **Generated**: 2025‑08‑31 01:03:44 (America/Port‑Au‑Prince)  
+> **Scope**: All changes that actually affect the public API, build process or user experience.  
 
 ---
 
----
-
-### [1.7.4] -  08/29/2025
-
-#### Bug Fixes
-- **strip command bug fixed** - Resolved an issue where the `strip` command failed on certain binaries and produced incomplete output. The command now reliably strips symbols across all supported platforms.
-
-- **Manual install nginx issues resolved** - Fixed problems with the manual installation process that caused Nginx configuration errors. The installer now correctly detects and configures Nginx, ensuring smooth integration and no service interruptions.
-
-#### Documentation
-- **Outdated README replaced** - Updated the README with accurate installation, usage, and troubleshooting instructions reflecting the latest features and workflows.
+## 2025‑08‑30
+| Area | What Changed |
+|------|--------------|
+| **Codebase** | • Added `DatabaseWithLogging` in all classes that perform DB work.  <br>• Updated all PDO usage to log queries (query time, statement, parameters). |
+| **Schema** | • Inserted `email` column in `users` (fixes silent user‑creation failures). |
+| **Affiliate** | • Detect `cargo_affiliate` cookie during checkout.  <br>• Create referral records in `affiliate_referrals`. |
+| **Build** | • Removed all `sccache` verification (prevents false build errors).  <br>• Produced ARM64‑Linux (musl) and macOS‑Intel binaries; macOS‑Intel build skipped because `osxcross` was missing. |
+| **CLI** | • `cm version` now supports Patch, Minor, Major, Custom policy.  <br>• Added `cm tool`, `cm check`, `cm view`, `cm optimize`.  <br>• `cm install` auto‑detects platform, downloads the right tarball, installs binaries. |
+| **Security & Deployment** | • SSL certificates are installed/valid on all domains.  <br>• Fixed Nginx redirect rule (`$server_name → $host`).  <br>• Added musl OpenSSL fallback chain.  <br>• Updated Nginx to route download requests through a PHP handler that logs each request. |
 
 ---
+
+## 2025‑08‑29
+| Area | What Changed |
+|------|--------------|
+| **Affinity Tables** | • Created `affiliate_payouts` – tracks quarterly payouts.  <br>• Added proper indices for fast lookup. |
+| **Build Stability** | • Completely disabled `sccache`; all builds run cleanly. |
+| **Platforms** | • Built ARM64‑Linux (musl), Windows (x86_64, i686). |
+| **Versioning** | • `Cargo.toml` auto‑synchronises on each Cargo command (increment `1.0.0 → 1.0.1` by default). |
+| **NGINX** | • Removed old `mate.grim.so` site‑configuration. |
+| **Enhancements** | • `cm optimize` added per‑profile optimization switches (Aggressive, Balanced, Conservative, Custom). |
+| **Installer** | • All installer scripts live in a single `sh/` folder; embedded via `include_str!`. |
+
+---
+
+## 2025‑08‑28
+| Area | What Changed |
+|------|--------------|
+| **API** | • `/api/download‑stats.php` & `/api/webhook.php` now log all queries.  <br>• `/api/download.php` logs affiliate information & file names. |
+| **CLI** | • `cm exec` added: runs arbitrary Cargo commands with pre/post hooks & auto‑increment.  <br>• `cm install` now supports PowerShell (`install.ps1`) on Windows. |
+| **Environment** | • All DB credentials moved to `DB_*` env vars; no hard‑coded secrets. |
+| **Configuration** | • Added `config.rs` for persistent, per‑project configuration and CLI `cm config` command. |
+
+---
+
+## 2025‑08‑27
+| Area | What Changed |
+|------|--------------|
+| **Affiliate System** | • Full creation of `Affiliates` & `AffiliateReferrals` tables.  <br>• Cookie capture (`cargo_mate_afl`) now marks users as `referred = TRUE`. |
+| **Installer / Protection** | • XOR‑encrypted, per‑platform `captain` binaries.  <br>• Fallback key chain (`CAPTAIN_SOBER / CAPTAIN_DRUNK`) for offline usage. |
+| **Upgrades** | • Added `cm upgrade` command to update binaries & embedded installer scripts. |
+| **Maintenance** | • Automatic cleanup of old logs & database backups. |
+
+---
+
+## 2025‑08‑26
+| Area | What Changed |
+|------|--------------|
+| **Distribution** | • All installer scripts are embedded into the single `cm` binary (`include_str!`), removing any external script dependencies. |
+| **Command Surface** | • `cm list`, `cm find`, `cm strip`, `cm map`, `cm wtf`, `cm help`. |
+| **Logging** | • Structured logs with timestamp, context and error description.  <br>• `cm view errors` reads from `~/.shipwreck/errors/latest.txt`. |
+
+---
+
+## 2025‑08‑25
+| Area | What Changed |
+|------|--------------|
+| **Checkout Flow** | • Affiliate cookie capture now fully functional; `set_test_affiliate_cookie.php` correctly flags referrals. |
+| **Stripe** | • Single “Card Information” element used; `stripe.createPaymentMethod()` receives it correctly. |
+| **Cert & Redirects** | • Nginx uses `$host`; all certs are now valid. |
+| **Email** | • Professional HTML templates for license delivery, purchase confirmation, renewal reminders. |
+| **Codebase** | • Removed obsolete ML/AI modules (`ml_engine.rs`, `analytics_engine.rs`, etc.); stubs left only for backward compatibility. |
+
+---
+
+## 2025‑08‑24
+| Area | What Changed |
+|------|--------------|
+| **Command Naming** | • Every command now starts with `cm`; old `captain` sub‑command naming removed. |
+| **Wrappers** | • All wrapper scripts (`wrapper-linux.sh`, `wrapper-macos.sh`, `wrapper-windows.ps1`) consolidated into a single `wrapper/` directory. |
+
+---
+
+## 2025‑08‑23 – 2025‑08‑21
+| Area | What Changed |
+|------|--------------|
+| **Compatibility** | • GLIBC requirement lowered 2.39 → 2.31; musl fallback added for Alpine & legacy systems. |
+| **CLI** | • `cm exec` now accepts any Cargo command with automatic version bump. |
+| | • Standardised the key used for the affiliate cookie (`cargo_mate_afl`). |
+| | • Updated `tide`, `treasure_map`, and `optimize` modules to expose clean delegates (`captain::*`). |
+| | • Permission checks added to commands; error codes returned to the shell. |
+
+---
+
+### Quick‑Start Cheat Sheet
+
+| Command | Purpose |
+|---------|---------|
+| `cm install` | Installs `cm` and the protected `captain` binary for your platform. |
+| `cm version` | Show current version; `cm version bump [patch|minor|major]` to auto‑increment. |
+| `cm check` | Checks Cargo and toolchain for missing dependencies. |
+| `cm view errors` | Opens the latest error log. |
+| `cm optimize [profile]` | Applies the chosen optimization profile (`aggressive`, `balanced`, `conservative`). |
+| `cm strip [options]` | Obfuscation tool to rename identifiers, scramble strings, pack files. |
+| `cm map` | Generate a visual dependency map. |
+| `cm wtf [sub‑cmd]` | AI‑powered troubleshooting assistant (e.g., `wtf analyze`, `wtf fix`). |
+| `cm upgrade` | Pulls the next release and updates the binary + installer scripts. |

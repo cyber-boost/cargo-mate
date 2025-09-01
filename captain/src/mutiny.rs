@@ -308,7 +308,7 @@ pub fn check_helmsman_direction(command: &str) -> Result<bool> {
         "🧭 Helmsman checking course for command '{}' - steady as she goes!", command
         .cyan()
     );
-    let license_manager = license::LicenseManager::new()?;
+    let license_manager = license::LicenseManager::new();
     match license_manager.enforce_license(command) {
         Ok(_) => {
             println!(

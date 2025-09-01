@@ -110,8 +110,7 @@ impl FeatureMapTool {
                     .get("features")
                     .and_then(|f| f.as_array())
                     .map(|arr| {
-                        arr
-                            .iter()
+                        arr.iter()
                             .filter_map(|v| v.as_str().map(|s| s.to_string()))
                             .collect::<Vec<_>>()
                     });

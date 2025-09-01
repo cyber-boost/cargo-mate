@@ -1,7 +1,8 @@
 use crate::checklist;
 use crate::history;
-use crate::parser::{self, MessageData, ParsedError, ParsedWarning};
-use crate::tide::{TideCharts, BuildMetrics};
+use crate::captain::parser::{self, MessageData, ParsedError, ParsedWarning};
+use crate::captain::tide::TideCharts;
+use crate::captain::tide::BuildMetrics;
 use crate::captain::license;
 use colored::*;
 use anyhow::{Result, Context};
@@ -710,19 +711,25 @@ fn record_build_metrics(
         let dependencies_compiled = get_dependencies_compiled();
         let crate_units_compiled = get_crate_units_compiled();
         let metrics = BuildMetrics {
-            timestamp: Utc::now(),
+            timestamp: Utc::now().to_string(),
             command,
             duration_seconds: elapsed.as_secs_f64(),
             success,
-            error_count,
-            warning_count,
+            error_count: error_count.try_into().unwrap(),
+            warning_count: warning_count.try_into().unwrap(),
             incremental: args.contains(&"--incremental") || args.contains(&"-i"),
             profile,
             features,
-            dependencies_compiled,
-            crate_units_compiled,
+            dependencies_compiled: dependencies_compiled.try_into().unwrap(),
+            crate_units_compiled: crate_units_compiled.try_into().unwrap(),
             memory_peak_mb: None,
             cpu_usage_percent: None,
+            average_build_time: 0.0,
+            failed_builds: 0,
+            improvement_trend: "stable".to_string(),
+            total_builds: 1,
+            successful_builds: if success { 1 } else { 0 },
+            top_errors: Vec::new(),
         };
         if let Err(e) = tide.record_build(metrics) {
             eprintln!("⚠️  Failed to record build metrics: {}", e);
@@ -802,7 +809,7 @@ pub fn check_first_mate_monitor(command: &str) -> Result<bool, anyhow::Error> {
     println!(
         "🥽 First mate monitoring command '{}' - all hands report!", command.cyan()
     );
-    let license_manager = license::LicenseManager::new()?;
+    let license_manager = license::LicenseManager::new();
     match license_manager.enforce_license(command) {
         Ok(_) => {
             println!(

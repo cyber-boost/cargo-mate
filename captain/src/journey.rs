@@ -1015,8 +1015,7 @@ impl JourneyMarketplace {
                             tags: journey["tags"]
                                 .as_array()
                                 .map(|tags| {
-                                    tags
-                                        .iter()
+                                    tags.iter()
                                         .filter_map(|t| t.as_str())
                                         .map(|s| s.to_string())
                                         .collect()
@@ -1070,7 +1069,7 @@ pub fn check_buoy_clearance(command: &str) -> Result<bool> {
         "🛟 Buoy check! Verifying command '{}' through the navigation channel", command
         .cyan()
     );
-    let license_manager = license::LicenseManager::new()?;
+    let license_manager = license::LicenseManager::new();
     match license_manager.enforce_license(command) {
         Ok(_) => {
             println!(

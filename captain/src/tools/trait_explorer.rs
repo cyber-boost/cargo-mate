@@ -173,8 +173,7 @@ impl TraitExplorerTool {
                 attrs
                     .iter()
                     .map(|attr| {
-                        attr
-                            .path()
+                        attr.path()
                             .segments
                             .iter()
                             .map(|seg| seg.ident.to_string())
@@ -641,8 +640,7 @@ impl TraitExplorerTool {
         }
         suggestions
             .sort_by(|a, b| {
-                b
-                    .confidence
+                b.confidence
                     .partial_cmp(&a.confidence)
                     .unwrap_or(std::cmp::Ordering::Equal)
             });

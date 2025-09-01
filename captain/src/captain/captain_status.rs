@@ -1,8 +1,11 @@
-use anyhow::Result;
+use anyhow::{Context, Result, anyhow};
 use serde::{Deserialize, Serialize};
 use std::fs;
-use std::path::PathBuf;
-use std::sync::OnceLock;
+use std::io::Write;
+use std::path::{Path, PathBuf};
+use std::process::Command;
+use colored::*;
+use tempfile::tempdir;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum CaptainStatus {
     NotInstalled,
@@ -13,6 +16,11 @@ pub enum CaptainStatus {
         last_verified: String,
     },
     Corrupted { path: String, reason: String },
+}
+pub struct SimpleCaptainStatus {
+    pub is_installed: bool,
+    pub binary_path: Option<PathBuf>,
+    pub version: Option<String>,
 }
 static CAPTAIN_STATUS: std::sync::Mutex<Option<CaptainStatus>> = std::sync::Mutex::new(
     None,
@@ -48,125 +56,196 @@ fn save_captain_status(status: &CaptainStatus) -> Result<()> {
     Ok(())
 }
 fn verify_captain_binary(path: &str) -> Result<(), String> {
-    match fs::metadata(path) {
-        Ok(metadata) => {
-            if metadata.len() < 1000 {
-                return Err(
-                    "Captain binary is too small (possibly corrupted)".to_string(),
-                );
-            }
-            #[cfg(unix)]
-            {
-                use std::os::unix::fs::PermissionsExt;
-                let mode = metadata.permissions().mode();
-                if mode & 0o111 == 0 {
-                    return Err("Captain binary is not executable".to_string());
-                }
-            }
-            Ok(())
+    if !Path::new(path).exists() {
+        return Err(format!("Binary not found: {}", path));
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let metadata = fs::metadata(path).map_err(|e| e.to_string())?;
+        let permissions = metadata.permissions();
+        if permissions.mode() & 0o111 == 0 {
+            return Err(format!("Binary is not executable: {}", path));
         }
-        Err(e) => Err(format!("Cannot access captain binary: {}", e)),
+    }
+    Ok(())
+}
+pub fn get_captain_status() -> SimpleCaptainStatus {
+    let binary_path = find_captain_binary();
+    SimpleCaptainStatus {
+        is_installed: binary_path.is_some(),
+        binary_path,
+        version: None,
     }
 }
-pub fn find_captain_binary() -> Option<String> {
-    let home = std::env::var("HOME").unwrap_or_else(|_| ".".to_string());
-    let user = std::env::var("USER").unwrap_or_else(|_| "user".to_string());
-    let captain_paths = [
-        format!("{}/.shipwreck/bin/captain", home),
-        "/root/.shipwreck/bin/captain".to_string(),
-        "/usr/local/bin/captain".to_string(),
-        "/usr/bin/captain".to_string(),
-        format!("{}/.local/bin/captain", home),
-        format!("/root/.local/bin/captain"),
-        format!("{}/.cargo/bin/captain", home),
-        format!("/home/{}/.shipwreck/bin/captain", user),
-        format!("/home/{}/.local/bin/captain", user),
-        format!("/home/{}/.cargo/bin/captain", user),
-        "captain".to_string(),
-        "./captain".to_string(),
-    ];
-    if let Ok(output) = std::process::Command::new("which").arg("captain").output() {
-        if output.status.success() && !output.stdout.is_empty() {
-            let path = String::from_utf8_lossy(&output.stdout).trim().to_string();
-            if !path.is_empty() {
-                if let Ok(resolved) = std::fs::read_link(&path) {
-                    if let Some(parent) = resolved.parent() {
-                        if let Some(file_name) = resolved.file_name() {
-                            let resolved_path = parent.join(file_name);
-                            if resolved_path.exists() {
-                                return Some(resolved_path.to_string_lossy().to_string());
-                            }
-                        }
-                    }
-                }
-                return Some(path);
-            }
+pub fn auto_download_captain() -> Result<PathBuf> {
+    let os = std::env::consts::OS;
+    let arch = std::env::consts::ARCH;
+    let platform = match os {
+        "linux" => "linux",
+        "macos" => "macos",
+        "windows" => "windows",
+        _ => return Err(anyhow::anyhow!("Unsupported operating system: {}", os)),
+    };
+    let architecture = match arch {
+        "x86_64" => "x86_64",
+        "aarch64" => "aarch64",
+        _ => return Err(anyhow::anyhow!("Unsupported architecture: {}", arch)),
+    };
+    let download_url = format!(
+        "https://get.cargo.do/captain/captain-{}-{}.tar.gz", platform, architecture
+    );
+    println!("📥 {}", format!("Downloading from: {}", download_url) .bright_black());
+    let temp_dir = tempdir()?;
+    let archive_path = temp_dir.path().join("captain.tar.gz");
+    let client = reqwest::blocking::Client::new();
+    let response = client
+        .get(&download_url)
+        .send()
+        .context("Failed to download captain binary")?;
+    if !response.status().is_success() {
+        return Err(
+            anyhow::anyhow!("Download failed with status: {}", response.status()),
+        );
+    }
+    let content = response.bytes()?;
+    let mut file = fs::File::create(&archive_path)?;
+    file.write_all(&content)?;
+    println!("📦 {}", "Extracting captain binary...".bright_blue());
+    let output = Command::new("tar")
+        .arg("-xzf")
+        .arg(&archive_path)
+        .current_dir(temp_dir.path())
+        .output()
+        .context("Failed to extract captain archive")?;
+    if !output.status.success() {
+        return Err(
+            anyhow::anyhow!(
+                "Extraction failed: {}", String::from_utf8_lossy(& output.stderr)
+            ),
+        );
+    }
+    let captain_binary = temp_dir.path().join("captain");
+    if !captain_binary.exists() {
+        let captain_protected = temp_dir.path().join("captain.protected");
+        let captain_exe = temp_dir.path().join("captain.exe");
+        if captain_protected.exists() {
+            println!(
+                "🔐 {}", "Found protected captain binary (requires protection key)"
+                .yellow()
+            );
+            return Err(
+                anyhow::anyhow!(
+                    "Protected binary found - please install manually with: cm captain install"
+                ),
+            );
+        } else if captain_exe.exists() {
+            return Err(anyhow::anyhow!("Windows binary found on non-Windows system"));
+        } else {
+            return Err(anyhow::anyhow!("No captain binary found in archive"));
         }
     }
-    for path in &captain_paths {
-        if std::path::Path::new(path).is_file() {
-            if let Ok(metadata) = fs::metadata(path) {
-                if metadata.len() > 0 {
-                    if let Ok(resolved) = std::fs::read_link(path) {
-                        if let Some(parent) = resolved.parent() {
-                            if let Some(file_name) = resolved.file_name() {
-                                let resolved_path = parent.join(file_name);
-                                if resolved_path.exists() {
-                                    return Some(resolved_path.to_string_lossy().to_string());
-                                }
-                            }
-                        }
-                    }
-                    return Some(path.clone());
-                }
-            }
+    let home_dir = dirs::home_dir().context("Could not determine home directory")?;
+    let shipwreck_dir = home_dir.join(".shipwreck");
+    let shipwreck_bin = shipwreck_dir.join("bin");
+    fs::create_dir_all(&shipwreck_bin)?;
+    let captain_dest = shipwreck_bin.join("captain");
+    fs::copy(&captain_binary, &captain_dest)?;
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let mut perms = fs::metadata(&captain_dest)?.permissions();
+        perms.set_mode(0o755);
+        fs::set_permissions(&captain_dest, perms)?;
+    }
+    Ok(captain_dest)
+}
+pub fn find_captain_binary() -> Option<PathBuf> {
+    let possible_paths = vec![
+        dirs::home_dir().map(| p | p.join(".shipwreck").join("bin").join("captain")),
+        dirs::home_dir().map(| p | p.join(".cargo").join("bin").join("captain")),
+        Some(PathBuf::from("/usr/local/bin/captain")),
+        Some(PathBuf::from("/usr/bin/captain")), dirs::home_dir().map(| p | p
+        .join(".shipwreck").join("bin").join("captain.protected")), dirs::home_dir()
+        .map(| p | p.join(".cargo").join("bin").join("captain.protected")),
+        Some(PathBuf::from("/usr/local/bin/captain.protected")),
+        Some(PathBuf::from("/usr/bin/captain.protected")),
+    ];
+    for path in possible_paths.into_iter().flatten() {
+        if path.exists() {
+            return Some(path);
         }
     }
     None
 }
-pub fn get_captain_status() -> CaptainStatus {
-    if let Ok(mut cache) = CAPTAIN_STATUS.lock() {
-        if let Some(status) = cache.as_ref() {
+pub fn is_captain_available() -> bool {
+    if let Some(path) = find_captain_binary() {
+        if path.to_string_lossy().ends_with("/captain")
+            || path.file_name().map_or(false, |f| f == "captain")
+        {
+            return true;
+        }
+        match verify_captain_binary(&path.to_string_lossy()) {
+            Ok(_) => true,
+            Err(_) => if std::env::var("PROTECT_KEY").is_ok() { true } else { false }
+        }
+    } else {
+        false
+    }
+}
+fn get_cached_status() -> CaptainStatus {
+    if let Ok(cache) = CAPTAIN_STATUS.lock() {
+        if let Some(status) = &*cache {
             return status.clone();
         }
     }
-    let status = load_captain_status().unwrap_or(CaptainStatus::NotInstalled);
-    if let Ok(mut cache) = CAPTAIN_STATUS.lock() {
-        *cache = Some(status.clone());
+    if let Some(captain_path) = find_captain_binary() {
+        let captain_path_str = captain_path.to_string_lossy().to_string();
+        match verify_captain_binary(&captain_path_str) {
+            Ok(_) => {
+                mark_captain_installed(&captain_path_str).ok();
+                CaptainStatus::Installed {
+                    path: captain_path_str,
+                    installed_at: chrono::Utc::now().to_rfc3339(),
+                    version: None,
+                    last_verified: chrono::Utc::now().to_rfc3339(),
+                }
+            }
+            Err(reason) => {
+                mark_captain_corrupted(&captain_path_str, &reason).ok();
+                CaptainStatus::Corrupted {
+                    path: captain_path_str,
+                    reason,
+                }
+            }
+        }
+    } else {
+        CaptainStatus::NotInstalled
     }
-    status
-}
-pub fn is_captain_available() -> bool {
-    matches!(get_captain_status(), CaptainStatus::Installed { .. })
 }
 pub fn get_captain_path() -> Option<String> {
-    match get_captain_status() {
+    match get_cached_status() {
         CaptainStatus::Installed { path, .. } => Some(path),
-        _ => find_captain_binary(),
+        _ => find_captain_binary().map(|p| p.to_string_lossy().to_string()),
     }
 }
-pub fn mark_captain_installed(captain_path: &str) -> Result<()> {
-    let now = chrono::Utc::now().to_rfc3339();
-    let status = CaptainStatus::Installed {
-        path: captain_path.to_string(),
-        installed_at: now.clone(),
-        version: None,
-        last_verified: now,
-    };
-    save_captain_status(&status)?;
+pub fn mark_captain_installed(path: &str) -> Result<()> {
     if let Ok(mut cache) = CAPTAIN_STATUS.lock() {
-        *cache = Some(status);
+        *cache = Some(CaptainStatus::Installed {
+            path: path.to_string(),
+            installed_at: chrono::Utc::now().to_rfc3339(),
+            version: None,
+            last_verified: chrono::Utc::now().to_rfc3339(),
+        });
     }
     Ok(())
 }
-pub fn mark_captain_corrupted(captain_path: &str, reason: &str) -> Result<()> {
-    let status = CaptainStatus::Corrupted {
-        path: captain_path.to_string(),
-        reason: reason.to_string(),
-    };
-    save_captain_status(&status)?;
+pub fn mark_captain_corrupted(path: &str, reason: &str) -> Result<()> {
     if let Ok(mut cache) = CAPTAIN_STATUS.lock() {
-        *cache = Some(status);
+        *cache = Some(CaptainStatus::Corrupted {
+            path: path.to_string(),
+            reason: reason.to_string(),
+        });
     }
     Ok(())
 }
@@ -185,20 +264,23 @@ pub fn refresh_captain_status() -> Result<CaptainStatus> {
         *cache = None;
     }
     if let Some(captain_path) = find_captain_binary() {
-        match verify_captain_binary(&captain_path) {
+        match verify_captain_binary(&captain_path.to_string_lossy()) {
             Ok(_) => {
-                mark_captain_installed(&captain_path)?;
+                mark_captain_installed(&captain_path.to_string_lossy())?;
                 Ok(CaptainStatus::Installed {
-                    path: captain_path,
+                    path: captain_path.to_string_lossy().to_string(),
                     installed_at: chrono::Utc::now().to_rfc3339(),
                     version: None,
                     last_verified: chrono::Utc::now().to_rfc3339(),
                 })
             }
             Err(reason) => {
-                mark_captain_corrupted(&captain_path, &reason)?;
+                mark_captain_corrupted(
+                    &captain_path.to_string_lossy().to_string(),
+                    &reason,
+                )?;
                 Ok(CaptainStatus::Corrupted {
-                    path: captain_path,
+                    path: captain_path.to_string_lossy().to_string(),
                     reason,
                 })
             }
@@ -209,7 +291,7 @@ pub fn refresh_captain_status() -> Result<CaptainStatus> {
     }
 }
 pub fn get_captain_status_info() -> String {
-    match get_captain_status() {
+    match get_cached_status() {
         CaptainStatus::NotInstalled => {
             format!(
                 "Captain Status: Not Installed\nCaptain Paths Checked: {} locations",

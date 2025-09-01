@@ -836,8 +836,7 @@ impl RefactorEngineTool {
                     .attrs
                     .iter()
                     .filter(|attr| {
-                        attr
-                            .path()
+                        attr.path()
                             .segments
                             .first()
                             .map(|seg| seg.ident == "derive")

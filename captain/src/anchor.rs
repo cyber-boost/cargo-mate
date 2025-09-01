@@ -556,7 +556,7 @@ pub fn check_license_ahoy(command: &str) -> Result<bool> {
         "🏴‍☠️ Ahoy there, matey! Let me check yer license for '{}'", command
         .cyan()
     );
-    let license_manager = license::LicenseManager::new()?;
+    let license_manager = license::LicenseManager::new();
     match license_manager.enforce_license(command) {
         Ok(_) => {
             println!("✅ Aye aye, Captain! License be valid. Full speed ahead!");

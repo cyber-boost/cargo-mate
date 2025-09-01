@@ -1,87 +1,95 @@
-use anyhow::Result;
-use serde::{Deserialize, Serialize};
-#[derive(Debug, Serialize, Deserialize)]
-pub struct LicenseValidation {
-    pub valid: bool,
-    pub tier: String,
-    pub remaining: Option<i32>,
-    pub used: Option<i32>,
-    pub unlimited: Option<bool>,
-    pub expires_at: Option<String>,
-    pub error: Option<String>,
-}
-use std::collections::HashMap;
-#[derive(Debug)]
-pub struct LicenseManager;
+use anyhow::{Context, Result};
+use std::process::Command;
+use colored::*;
+pub struct LicenseManager {}
 impl LicenseManager {
-    pub fn new() -> Result<Self> {
-        eprintln!("🔐 LicenseManager needed to be a captain");
-        Ok(LicenseManager)
+    pub fn new() -> Self {
+        Self {}
     }
-    pub fn enforce_license(&self, _command: &str) -> Result<()> {
-        eprintln!("🔐 License enforcement requires captain to be sober.");
+    pub fn check_license(&self) -> Result<bool> {
+        println!(
+            "🔐 {}", "License verification requires the advanced captain binary"
+            .bright_blue()
+        );
+        println!("   Delegating to captain for license validation...");
+        self.delegate_to_captain(vec!["license", "check"])
+    }
+    pub fn enforce_license(&self, command: &str) -> Result<bool> {
+        println!(
+            "🔐 {}", format!("License enforcement for '{}' requires captain binary",
+            command) .bright_blue()
+        );
+        println!("   Delegating to captain for license enforcement...");
+        self.delegate_to_captain(vec!["license", "enforce", command])
+    }
+    pub fn register_license(&self, license_key: &str) -> Result<()> {
+        println!("🔐 {}", format!("Registering license: {}", license_key) .yellow());
+        println!("   Delegating to captain for license registration...");
+        self.delegate_to_captain(vec!["license", "register", license_key])?;
         Ok(())
     }
-    pub fn debug_command_counters(&self) -> Result<()> {
-        eprintln!("🔐 License analytics require captain to be sober.");
-        Ok(())
-    }
-    pub fn reset_local_command_count(&self) -> Result<()> {
-        eprintln!("🔐 Advanced license management requires captain to be sober.");
-        Ok(())
-    }
-    pub fn get_user_tier(&self) -> Result<String> {
-        eprintln!("🔐 User tier information requires captain to be sober.");
-        Ok("open-source".to_string())
-    }
-    pub fn get_remaining_commands(&self) -> Result<i32> {
-        eprintln!("🔐 Command limits require captain to be sober.");
-        Ok(i32::MAX)
+    pub fn get_stored_license_info(&self) -> Result<(String, String)> {
+        println!(
+            "🔐 {}", "Retrieving license information requires captain binary"
+            .bright_blue()
+        );
+        println!("   Delegating to captain for license info...");
+        self.delegate_to_captain(vec!["license", "info"])
+            .map(|_| ("CM-DEMO-KEY".to_string(), "FREE".to_string()))
     }
     pub fn get_or_create_user_id(&self) -> Result<String> {
-        eprintln!("🔐 User ID generation requires captain to be sober.");
-        Ok("open-source-user".to_string())
+        println!("👤 {}", "User ID management requires captain binary".bright_blue());
+        println!("   Delegating to captain for user ID...");
+        self.delegate_to_captain(vec!["license", "userid"])
+            .map(|_| "user_demo_123".to_string())
     }
-    pub fn get_local_license(&self) -> Result<String> {
-        eprintln!("🔐 License retrieval requires captain to be sober.");
-        Ok("open-source-license".to_string())
+    fn delegate_to_captain(&self, args: Vec<&str>) -> Result<bool> {
+        let captain_path = match crate::captain::captain_status::find_captain_binary() {
+            Some(path) => path,
+            None => {
+                println!("❌ {}", "Advanced captain binary not found".red().bold());
+                println!(
+                    "🔄 {}", "Auto-downloading captain binary from get.cargo.do/"
+                    .cyan()
+                );
+                match crate::captain::captain_status::auto_download_captain() {
+                    Ok(path) => path,
+                    Err(e) => {
+                        println!(
+                            "❌ {}", format!("Failed to download captain: {}", e) .red()
+                        );
+                        println!("💡 {}", "Please run: cm captain install".cyan());
+                        println!("   Or visit: https://cargo.do/pro");
+                        println!();
+                        println!(
+                            "💡 {}", "License features require the captain binary:"
+                            .cyan()
+                        );
+                        println!("   • License validation and enforcement");
+                        println!("   • User ID management");
+                        println!("   • Pro feature access");
+                        println!("   • Advanced configuration");
+                        return Ok(true);
+                    }
+                }
+            }
+        };
+        let output = Command::new(&captain_path)
+            .args(&args)
+            .output()
+            .context("Failed to execute captain binary for license operation")?;
+        if !output.stdout.is_empty() {
+            print!("{}", String::from_utf8_lossy(& output.stdout));
+        }
+        if !output.stderr.is_empty() {
+            eprint!("{}", String::from_utf8_lossy(& output.stderr));
+        }
+        if !output.status.success() {
+            println!(
+                "❌ {}", format!("Captain binary exited with status: {}", output.status)
+                .red()
+            );
+        }
+        Ok(output.status.success())
     }
-    pub fn show_user_info(&self) -> Result<()> {
-        Ok(())
-    }
-    pub fn is_license_expired(&self) -> Result<bool> {
-        Ok(false)
-    }
-    pub fn register_license(&self, _key: &str) -> Result<()> {
-        Ok(())
-    }
-    pub fn check_license_status(&self) -> Result<LicenseValidation> {
-        Ok(LicenseValidation {
-            valid: true,
-            tier: "FREE".to_string(),
-            remaining: Some(100),
-            used: Some(0),
-            unlimited: Some(false),
-            expires_at: None,
-            error: None,
-        })
-    }
-    pub fn check_remaining_commands(&self) -> Result<i32> {
-        eprintln!("🔐 Command limits require captain to be sober.");
-        Ok(i32::MAX)
-    }
-    pub fn get_license_info(&self) -> Result<serde_json::Value> {
-        Ok(
-            serde_json::json!(
-                { "license_key" : "open-source", "tier" : "FAKE", "daily_usage_count" :
-                0, "daily_limit" : 100, "remaining_commands" : 100 }
-            ),
-        )
-    }
-}
-pub fn check_captain_authority(_command: &str) -> Result<bool> {
-    Ok(true)
-}
-pub fn check_sea_legs(_command: &str) -> Result<bool> {
-    Ok(true)
 }

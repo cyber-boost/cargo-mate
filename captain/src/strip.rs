@@ -3,7 +3,7 @@ use clap::Parser;
 use std::fs;
 use std::path::PathBuf;
 use walkdir::WalkDir;
-#[derive(Parser, Debug)]
+#[derive(Parser, Debug, Clone)]
 #[command(
     name = "strip",
     about = "Strip comments, blank lines, and attributes from Rust source code",

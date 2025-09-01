@@ -30,6 +30,7 @@ pub mod lifetime_visualizer;
 pub mod compile_time_tracker;
 pub mod mock_derive;
 pub mod coverage_guard;
+#[cfg(test)]
 pub mod snapshot_test;
 pub mod wasm_optimize;
 pub mod installer_gen;
@@ -157,7 +158,6 @@ pub fn create_registry() -> ToolRegistry {
         .register(compile_time_tracker::CompileTimeTrackerTool::new())
         .register(mock_derive::MockDeriveTool::new())
         .register(coverage_guard::CoverageGuardTool::new())
-        .register(snapshot_test::SnapshotTestTool::new())
         .register(wasm_optimize::WasmOptimizeTool::new())
         .register(installer_gen::InstallerGenTool::new())
         .register(migration_gen::MigrationGenTool::new())

@@ -389,8 +389,7 @@ impl RustMentorTool {
                     .attrs
                     .iter()
                     .map(|attr| {
-                        attr
-                            .path()
+                        attr.path()
                             .segments
                             .iter()
                             .map(|seg| seg.ident.to_string())

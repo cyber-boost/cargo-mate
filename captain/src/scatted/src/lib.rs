@@ -1,0 +1,11 @@
+pub mod protection;
+pub mod crypto;
+pub mod polymorphic;
+pub mod anti_analysis;
+pub mod string_obfuscator;
+pub mod integrity;
+pub mod loader_generator;
+pub mod compiler;
+pub mod decoy;
+pub use protection::BinaryProtector;
+pub use crypto::{encrypt_aes_gcm, decrypt_aes_gcm, derive_key};
