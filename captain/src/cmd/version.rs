@@ -3,10 +3,10 @@ use crate::captain::version::{VersionManager, IncrementPolicy};
 use crate::cmd::smune::{VersionAction, VersionConfigAction, IncrementType};
 use colored::Colorize;
 pub fn handle_version(action: VersionAction) -> Result<()> {
-    let mut version_manager = VersionManager::new()?;
+    let mut version_manager = VersionManager::new(None)?;
     match action {
         VersionAction::Init { version } => {
-            version_manager.init(version.unwrap_or_else(|| "0.1.0".to_string()))?;
+            version_manager.init(Some(version.unwrap_or_else(|| "0.1.0".to_string())))?;
         }
         VersionAction::Info => {
             version_manager.show_info();
@@ -41,7 +41,7 @@ pub fn handle_version(action: VersionAction) -> Result<()> {
             version_manager.set_version(&version)?;
         }
         VersionAction::History => {
-            let version_manager = VersionManager::new()?;
+            let version_manager = VersionManager::new(None)?;
             version_manager.show_history()?;
         }
         VersionAction::UpdateCargo => {

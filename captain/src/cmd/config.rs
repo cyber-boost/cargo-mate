@@ -1,7 +1,7 @@
 use anyhow::Result;
-use crate::captain::config::ConfigAction;
-pub fn handle_config(action: crate::captain::config::ConfigAction) -> Result<()> {
-    crate::captain::config::handle_config_action(action)
+use crate::ConfigAction;
+pub fn handle_config(action: crate::ConfigAction) -> Result<()> {
+    handle_config_internal(action)
 }
 pub fn handle_config_internal(action: ConfigAction) -> Result<()> {
     let mut config = crate::captain::config::ConfigManager::new()?;
@@ -27,6 +27,9 @@ pub fn handle_config_internal(action: ConfigAction) -> Result<()> {
         }
         ConfigAction::Hook { hook_type, command, local } => {
             config.add_hook(&hook_type, &command, local)?;
+        }
+        ConfigAction::Reset => {
+            config.reset()?;
         }
     }
     Ok(())

@@ -4,7 +4,7 @@ use aes_gcm::{
 };
 use anyhow::Result;
 use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
-const ENCRYPTION_KEY: &[u8] = b"your-256-bit-encryption-key-here-32-bytes";
+const ENCRYPTION_KEY: &[u8] = b"your-256-bit-key-32-bytes-hereee";
 pub fn encrypt_binary(data: &[u8]) -> Result<String> {
     let key = Key::<Aes256Gcm>::from_slice(ENCRYPTION_KEY);
     let cipher = Aes256Gcm::new(key);

@@ -1,5 +1,7 @@
 use anyhow::Result;
+use colored::*;
 use clap::Subcommand;
+use crate::version::{VersionManager, IncrementPolicy};
 #[derive(Subcommand, Debug)]
 pub enum VersionAction {
     Init {
@@ -18,7 +20,7 @@ pub enum VersionAction {
     UpdateCargo,
     Config { #[command(subcommand)] action: VersionConfigAction },
 }
-#[derive(Debug, Clone, clap::ValueEnum)]
+#[derive(Subcommand, Debug, Clone, clap::ValueEnum)]
 pub enum IncrementType {
     Patch,
     Minor,
@@ -31,20 +33,79 @@ pub enum VersionConfigAction {
     Policy { #[arg(value_enum)] policy: IncrementType },
     Show,
 }
-impl std::fmt::Display for IncrementType {
-    fn fmt(&self, _f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        unimplemented!()
+pub fn handle_version(action: VersionAction) -> Result<()> {
+    match action {
+        VersionAction::Init { version } => {
+            let mut manager = VersionManager::new(None)?;
+            manager.init(version)?;
+        }
+        VersionAction::Info => {
+            let manager = VersionManager::new(None)?;
+            manager.show_info();
+        }
+        VersionAction::Increment { increment_type } => {
+            let mut manager = VersionManager::new(None)?;
+            let new_version = match increment_type {
+                IncrementType::Patch => manager.increment()?,
+                IncrementType::Minor => {
+                    let original_policy = manager.config.increment_policy.clone();
+                    manager.config.increment_policy = IncrementPolicy::Minor;
+                    let result = manager.increment()?;
+                    manager.config.increment_policy = original_policy;
+                    result
+                }
+                IncrementType::Major => {
+                    let original_policy = manager.config.increment_policy.clone();
+                    manager.config.increment_policy = IncrementPolicy::Major;
+                    let result = manager.increment()?;
+                    manager.config.increment_policy = original_policy;
+                    result
+                }
+            };
+            println!("✅ Version incremented to: {}", new_version.cyan());
+        }
+        VersionAction::Set { version } => {
+            let mut manager = VersionManager::new(None)?;
+            manager.set_version(&version)?;
+        }
+        VersionAction::History => {
+            println!("📚 Version history feature coming soon!");
+            println!("For now, check the .v file for version changes.");
+        }
+        VersionAction::UpdateCargo => {
+            let manager = VersionManager::new(None)?;
+            manager.update_cargo_toml()?;
+        }
+        VersionAction::Config { action } => {
+            match action {
+                VersionConfigAction::Enable => {
+                    let mut manager = VersionManager::new(None)?;
+                    manager.config.auto_increment = true;
+                    manager.save_config()?;
+                    println!("✅ Auto-increment enabled");
+                }
+                VersionConfigAction::Disable => {
+                    let mut manager = VersionManager::new(None)?;
+                    manager.config.auto_increment = false;
+                    manager.save_config()?;
+                    println!("✅ Auto-increment disabled");
+                }
+                VersionConfigAction::Policy { policy } => {
+                    let mut manager = VersionManager::new(None)?;
+                    manager.config.increment_policy = match policy {
+                        IncrementType::Patch => IncrementPolicy::Patch,
+                        IncrementType::Minor => IncrementPolicy::Minor,
+                        IncrementType::Major => IncrementPolicy::Major,
+                    };
+                    manager.save_config()?;
+                    println!("✅ Increment policy updated");
+                }
+                VersionConfigAction::Show => {
+                    let manager = VersionManager::new(None)?;
+                    manager.show_info();
+                }
+            }
+        }
     }
-}
-impl std::str::FromStr for IncrementType {
-    type Err = String;
-    fn from_str(_s: &str) -> Result<Self, Self::Err> {
-        unimplemented!()
-    }
-}
-pub fn handle_version(_action: VersionAction) -> Result<()> {
-    unimplemented!()
-}
-pub fn version_action_to_args(_action: &VersionAction) -> Vec<String> {
-    unimplemented!()
+    Ok(())
 }

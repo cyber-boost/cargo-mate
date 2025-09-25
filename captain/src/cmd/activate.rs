@@ -1,11 +1,11 @@
 use anyhow::Result;
 use std::fs;
 use colored::Colorize;
-use crate::captain::shell_integration::{detect_shell, get_rc_file};
+use crate::captain::shell_integration::ShellIntegration;
 pub fn handle_activate() -> Result<()> {
     println!("⚡ Activating Cargo Mate shell integration...");
-    let shell = detect_shell();
-    let rc_file = get_rc_file(&shell)?;
+    let shell = ShellIntegration::detect_shell()?;
+    let rc_file = ShellIntegration::get_rc_file(&shell)?;
     if !rc_file.exists() {
         println!("❌ No shell configuration file found: {}", rc_file.display());
         println!("💡 Run 'cm init' first to set up shell integration");
@@ -45,8 +45,8 @@ pub fn handle_activate() -> Result<()> {
 }
 pub fn handle_install() -> Result<()> {
     println!("📦 Installing Cargo Mate shell integration...");
-    let shell = detect_shell();
-    let rc_file = get_rc_file(&shell)?;
+    let shell = ShellIntegration::detect_shell()?;
+    let rc_file = ShellIntegration::get_rc_file(&shell)?;
     if rc_file.exists() {
         let content = std::fs::read_to_string(&rc_file)?;
         if content.contains("# === Cargo Mate") {

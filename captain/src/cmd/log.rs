@@ -32,7 +32,7 @@ pub fn handle_log(action: LogAction) -> Result<()> {
                 "html" => captain_log::ExportFormat::Html,
                 _ => captain_log::ExportFormat::Markdown,
             };
-            log.export(path.to_string_lossy().as_ref(), fmt)?;
+            log.export(&path, fmt)?;
         }
         LogAction::Analyze => {
             let analysis = log.analyze();

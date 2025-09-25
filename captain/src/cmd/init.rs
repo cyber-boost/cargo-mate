@@ -4,7 +4,7 @@ use std::fs;
 use dirs;
 use colored::Colorize;
 use crate::captain::config::ConfigManager;
-use crate::captain::shell_integration::{detect_shell, get_rc_file};
+use crate::captain::shell_integration::ShellIntegration;
 pub fn is_build_process() -> bool {
     std::env::var("CARGO").is_ok() || std::env::var("RUSTC").is_ok()
         || std::env::var("CARGO_MANIFEST_DIR").is_ok()
@@ -91,17 +91,17 @@ pub fn init_cargo_mate() -> Result<()> {
     config.init_local()?;
     println!("✅ Local config created: .cg");
     println!("🔧 Setting up shell integration...");
-    let shell = detect_shell();
-    let rc_file = get_rc_file(&shell)?;
+    let shell = ShellIntegration::detect_shell()?;
+    let rc_file = ShellIntegration::get_rc_file(&shell)?;
     if rc_file.exists() {
         let content = std::fs::read_to_string(&rc_file)?;
         if content.contains("# === Cargo Mate") {
             eprintln!("⚠️  Shell integration already installed");
         } else {
-            crate::captain::shell_integration::add_shell_integration(&rc_file, &shell)?;
+            ShellIntegration::add_shell_integration(&rc_file, &shell)?;
         }
     } else {
-        crate::captain::shell_integration::add_shell_integration(&rc_file, &shell)?;
+        ShellIntegration::add_shell_integration(&rc_file, &shell)?;
     }
     eprintln!("📁 Error logs will be stored in ~/.shipwreck/");
     println!();

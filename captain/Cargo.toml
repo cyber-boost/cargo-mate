@@ -1,6 +1,6 @@
 [package]
 name = "cargo-mate"
-version = "1.7.4"
+version = "1.7.6"
 authors = ["cyber-boost"]
 description = "Rust development companion that enhances cargo with intelligent workflows, state management, performance optimization, and comprehensive project monitoring."
 edition = "2021"
@@ -21,7 +21,8 @@ exclude = [
     "Dockerfile*", 
     ".v", 
     ".cg",
-    "src/captain/embedded/"
+    "src/captain/embedded/",
+    "src/captain/sweeping/target/",
 ]
 
 # Build script for embedding binaries
@@ -33,6 +34,10 @@ tempfile = "3.10"
 [[bin]]
 name = "cm"
 path = "src/main.rs"
+
+[[bin]]
+name = "captain"
+path = "src/captain/main.rs"
 
 [lib]
 name = "cargo_mate"
@@ -88,6 +93,10 @@ clap = { version = "4.5", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde"] }
 uuid = { version = "1.0", features = ["v4"] }
+rusqlite = { version = "0.31", features = ["bundled"] }
+rand_chacha = "0.9"
+blake3 = "1.5"
+predicates = "3.1"
 
 [dependencies.prettyplease]
 version = "0.2"
@@ -150,3 +159,6 @@ inherits = "release-macros"
 inherits = "release-macros"
 [profile.release.package.proc-macro2]
 inherits = "release-macros"
+
+# Built by Bernie and Buddy
+# mate@cargo.do if you need help

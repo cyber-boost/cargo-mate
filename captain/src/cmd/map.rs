@@ -13,7 +13,7 @@ pub fn handle_map_internal(action: MapAction) -> Result<()> {
             analysis.display();
         }
         MapAction::Export { path } => {
-            map.export_dot(path.to_string_lossy().as_ref())?;
+            map.export_dot(&path)?;
         }
         MapAction::Path { from, to } => {
             if let Some(path) = map.find_path(&from, &to) {

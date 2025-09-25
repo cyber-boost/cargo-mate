@@ -2,34 +2,34 @@
 
 # Cargo Mate
 
-A Rust development companion that enhances cargo with intelligent workflows, state management, performance optimization, and comprehensive project monitoring.
+A Rust development companion that enhances cargo with intelligent workflows, state management, performance optimization, and comprehensive project monitoring. W.I.P. UNDER DEVELOPMENT!
 
 ## Table of Contents
-
 - [Quick Start](#-quick-start)
 - [Command Reference](#-command-reference)
-  - [Version Commands](#version-commands)
-  - [View Commands](#view-commands)
-  - [Log Commands](#log-commands)
-  - [Journey Commands](#journey-commands)
-  - [Anchor Commands](#anchor-commands)
-  - [Tide Commands](#tide-commands)
-  - [Scrub Commands](#scrub-commands)
-  - [Map Commands](#map-commands)
-  - [Mutiny Commands](#mutiny-commands)
-  - [Config Commands](#config-commands)
-  - [Optimize Commands](#optimize-commands)
-  - [Checklist Commands](#checklist-commands)
-  - [WTF Commands](#wtf-commands)
-  - [Idea Commands](#idea-commands)
-  - [User Commands](#user-commands)
-  - [Tool Commands](#tool-commands)
-  - [SCAT Commands](#scat-commands-source-code-obfuscation-tool)
-  - [Strip Commands](#strip-commands-code-cleaning--optimization)
-  - [General Commands](#general-commands)
-- [Installation](#-installation)
-- [Configuration](#️-configuration)
-- [Examples](#-examples)
+    - [Installation](#-installation)
+    - [Version Commands](#version-commands)
+    - [View Commands](#view-commands)
+    - [Log Commands](#captains-log-commands-natural-language-build-notes-with-automatic-tagging-and-search)
+    - [Journey Commands](#journey-commands)
+    - [Anchor Commands](#anchor-commands)
+    - [Tide Commands](#tide-commands)
+    - [Scrub Commands](#scrub-commands)
+    - [SCAT Commands](#scat-commands-source-code-obfuscation-tool-still-under-development)
+    - [Strip Commands](#strip-commands-code-cleaning--optimization)
+    - [Sweep Commands](#sweep-commands-ai-debug-statement-cleanup)
+    - [Map Commands](#map-commands)
+    - [Mutiny Commands](#mutiny-commands)
+    - [Config Commands](#config-commands)
+    - [Optimize Commands](#optimize-commands)
+    - [Checklist Commands](#checklist-commands)
+    - [WTF Commands](#wtf-commands-cargomate-ai---pro-only)
+    - [Tool Commands](#tool-commands)
+    - [DDR Commands](#ddr-commands-docker-dock-rust---parallel-build-orchestration--under-development)
+    - [General Commands](#general-commands)
+- [Project Configuration (.cg)](#project-configuration-cg)
+- [Global Configuration (~/.shipwreck/config.toml)](#global-configuration-shipwreckconfigtoml)
+- [Examples](#some-examples)
 - [License](#-license)
 
 ## 🚀 Installation
@@ -90,8 +90,8 @@ tar -xzf cargo-mate-windows-i686.tar.gz
 cd cargo-mate-windows-i686
 # Run install.ps1 in PowerShell as Administrator
 
-# Universal Linux (latest musl, portable)
-wget https://get.cargo.do/latest-musl.tar.gz -O cargo-mate-latest-musl.tar.gz
+# Universal ALL PLATFORMS AVAILABLE (most of the time contains all)
+wget https://get.cargo.do/latest.tar.gz -O cargo-mate-latest.tar.gz
 tar -xzf cargo-mate-latest-musl.tar.gz
 cd cargo-mate-latest-musl
 sudo ./install.sh
@@ -185,12 +185,78 @@ cm tide export <path>      # Save performance metrics and analytics data to exte
 ```
 
 ### Scrub Commands
+
+cm scrub run --directory -d <dir>         # Directory to start searching from (default: current)
+cm scrub run --dry-run -n                 # Show what would be cleaned without actually cleaning
+cm scrub run --verbose -v                 # Enable verbose output
+cm scrub run --resume-from -r <string>    # Resume from projects containing this string
+cm scrub run --min-depth <num>            # Minimum directory depth to search
+cm scrub run --max-depth <num>            # Maximum directory depth to search
+cm scrub run --jobs -j <num>              # Number of parallel workers (default: 4)
+cm scrub run --min-size <MB>              # Only show projects larger than this size (MB)
+cm scrub run --sort-by-size -s            # Sort results by size
+cm scrub run --export-json <file>         # Export results to JSON file
+cm scrub run --interactive -i             # Ask before cleaning each project
+cm scrub run --exclude -e <pattern>       # Exclude directories matching patterns (multiple)
+cm scrub run --stats-only                 # Only show statistics without cleaning
+
+
+### SCAT Commands (Source Code Obfuscation Tool) STILL UNDER DEVELOPMENT
 ```bash
-cm scrub run --dry-run     # Preview what files and directories would be cleaned without making changes
-cm scrub run -v            # Execute project cleanup with detailed verbose output showing all operations
-cm scrub run -s /home      # Clean only projects located within the specified directory path
-cm scrub run -r web        # Resume cleaning projects whose names contain the specified search term
-cm scrub run --min-depth 2 --max-depth 5 # Clean projects within specified directory depth range from root
+cm scat                    # Display overview of SCAT obfuscation capabilities
+cm scat names <PATH>       # Obfuscate file/folder names with mapping file
+cm scat code <PATH>        # Obfuscate Rust identifiers while preserving functionality
+cm scat strings <PATH>     # Scramble string literals with encryption key
+cm scat pack <INPUT> <OUTPUT> # Pack files into obfuscated bundle
+cm scat unpack <INPUT> <MAP> # Reverse obfuscation using mapping files
+
+# Examples:
+cm scat names src/ --map name_mapping.json --sequential
+cm scat code src/ --preserve-pub --min-len 3 --map code_mapping.json
+cm scat strings src/ --key "contest_key" --map strings.json
+cm scat pack src/ contest.bundle --compress
+cm scat unpack obfuscated/ name_mapping.json --output original/
+```
+
+### Strip Commands (Code Cleaning & Optimization)
+```bash
+cm strip <INPUT>           # Remove comments and non-essential elements from Rust files
+cm strip --tease           # strips maticulously comments and blank lines by file or directory 
+cm strip <INPUT> -o <FILE> # Strip to output file (defaults to stdout)
+cm strip <INPUT> -r        # Process directory recursively
+cm strip <INPUT> -b        # Remove blank lines
+cm strip <INPUT> -a        # Aggressive mode: maximum stripping
+cm strip <INPUT> --minify  # Minify to single line where possible
+cm strip <INPUT> --strip-attrs # Remove all attributes (#[...])
+cm strip <INPUT> --strip-docs  # Remove documentation comments
+
+# Examples:
+cm strip src/main.rs --output main.stripped.rs
+cm strip src/ -r --aggressive --backup
+cm strip src/ --recursive --strip-docs --minify
+cm strip src/main.rs --force --output src/main.rs
+```
+
+### Sweep Commands (AI Debug Statement Cleanup)
+```bash
+cm sweep                    # Display overview of sweep capabilities for cleaning AI debug statements
+cm sweep scan              # Scan for println!, eprintln!, and dbg! statements
+cm sweep sweep [options]   # Clean up debug statements with intelligent pattern recognition
+cm sweep convert           # Convert debug prints to proper logging statements
+cm sweep analyze           # Analyze debug statement patterns and statistics
+cm sweep init              # Initialize sweep configuration file
+
+# Sweep Options:
+cm sweep sweep -n          # Dry run (show what would be removed)
+cm sweep sweep -p          # Interactive mode with pattern memory learning
+cm sweep sweep -y          # Auto-approve all removals
+cm sweep sweep -i          # Interactive confirmation for each statement
+cm sweep sweep --backup    # Create backup files before cleaning
+
+# Examples:
+cm sweep sweep -p          # Learn patterns and clean interactively
+cm sweep sweep -y          # Quick cleanup of all AI debug statements
+cm sweep analyze --top 20  # Show top 20 files with most debug statements
 ```
 
 ### Map Commands
@@ -283,40 +349,26 @@ cm tool test-gen --file <path> --type <unit|integration|property>
     # Generate test boilerplate from Rust function signatures
 ```
 
-### SCAT Commands (Source Code Obfuscation Tool) STILL UNDER DEVELOPMENT
+### DDR Commands (Docker Dock Rust - Parallel Build Orchestration) 🚧 UNDER DEVELOPMENT
 ```bash
-cm scat                    # Display overview of SCAT obfuscation capabilities
-cm scat names <PATH>       # Obfuscate file/folder names with mapping file
-cm scat code <PATH>        # Obfuscate Rust identifiers while preserving functionality
-cm scat strings <PATH>     # Scramble string literals with encryption key
-cm scat pack <INPUT> <OUTPUT> # Pack files into obfuscated bundle
-cm scat unpack <INPUT> <MAP> # Reverse obfuscation using mapping files
+cm ddr                     # Display overview of DDR parallel Docker-based Rust build capabilities
+cm ddr build [options]     # Build Rust project using Docker containers with parallel orchestration
+cm ddr build --target <target> # Cross-compile for specific target architecture
+cm ddr build --jobs <num>  # Set maximum parallel build jobs (default: 16)
+cm ddr build --image <img> # Use custom Docker image for builds
+cm ddr build --profile <profile> # Build with specific profile (debug/release)
+
+# DDR Build Options:
+cm ddr build -n            # Dry run (show what would be built)
+cm ddr build --verbose     # Verbose output with detailed Docker commands
+cm ddr build --no-cache    # Disable Docker layer caching
+cm ddr build --clean       # Clean build artifacts before building
+cm ddr build --watch       # Watch mode (rebuild on changes)
 
 # Examples:
-cm scat names src/ --map name_mapping.json --sequential
-cm scat code src/ --preserve-pub --min-len 3 --map code_mapping.json
-cm scat strings src/ --key "contest_key" --map strings.json
-cm scat pack src/ contest.bundle --compress
-cm scat unpack obfuscated/ name_mapping.json --output original/
-```
-
-### Strip Commands (Code Cleaning & Optimization)
-```bash
-cm strip <INPUT>           # Remove comments and non-essential elements from Rust files
-cm strip --tease           # strips maticulously comments and blank lines by file or directory 
-cm strip <INPUT> -o <FILE> # Strip to output file (defaults to stdout)
-cm strip <INPUT> -r        # Process directory recursively
-cm strip <INPUT> -b        # Remove blank lines
-cm strip <INPUT> -a        # Aggressive mode: maximum stripping
-cm strip <INPUT> --minify  # Minify to single line where possible
-cm strip <INPUT> --strip-attrs # Remove all attributes (#[...])
-cm strip <INPUT> --strip-docs  # Remove documentation comments
-
-# Examples:
-cm strip src/main.rs --output main.stripped.rs
-cm strip src/ -r --aggressive --backup
-cm strip src/ --recursive --strip-docs --minify
-cm strip src/main.rs --force --output src/main.rs
+cm ddr build --target x86_64-unknown-linux-gnu --target aarch64-unknown-linux-gnu
+cm ddr build --jobs 32 --profile release
+cm ddr build --image rust:1.70 --verbose
 ```
 
 ### General Commands

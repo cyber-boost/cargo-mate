@@ -428,7 +428,8 @@ fn process_directory(
         .filter_map(|e| e.ok());
     for entry in walker {
         let path = entry.path();
-        if path.extension().and_then(|s| s.to_str()) == Some("rs") {
+        let extension = path.extension().and_then(|s| s.to_str());
+        if extension == Some("rs") {
             let output_path = if let Some(ref output_base) = output_base {
                 let relative = path.strip_prefix(dir).unwrap_or(path);
                 let output_file = output_base.join(relative);
@@ -528,6 +529,7 @@ fn main() {
             max_depth: 10,
             aggressive: false,
             minify: false,
+            tease: false,
             strip_attrs: false,
             strip_docs: false,
             inline_uses: false,
@@ -560,6 +562,7 @@ fn main() {
             max_depth: 10,
             aggressive: true,
             minify: false,
+            tease: false,
             strip_attrs: false,
             strip_docs: false,
             inline_uses: false,
@@ -583,6 +586,7 @@ fn main() {
             max_depth: 10,
             aggressive: false,
             minify: false,
+            tease: false,
             strip_attrs: false,
             strip_docs: false,
             inline_uses: false,
@@ -590,6 +594,7 @@ fn main() {
         assert_eq!(determine_input_path(& args).unwrap(), PathBuf::from("test.rs"));
         args.src = true;
         assert_eq!(determine_input_path(& args).unwrap(), PathBuf::from("src"));
+        args.src = false;
         args.target = Some(PathBuf::from("target/dir"));
         assert_eq!(determine_input_path(& args).unwrap(), PathBuf::from("target/dir"));
     }

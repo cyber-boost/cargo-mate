@@ -260,7 +260,7 @@ impl CommandFactory {
                 std::process::exit(1);
             }
             "version" => {
-                let mut version_manager = VersionManager::new()?;
+                let mut version_manager = VersionManager::new(None)?;
                 match remaining_args.get(0).map(|s| s.as_ref()) {
                     Some("history") => {
                         version_manager.show_history()?;

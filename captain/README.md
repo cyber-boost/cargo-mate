@@ -2,39 +2,38 @@
 
 # Cargo Mate
 
-A Rust development companion that enhances cargo with intelligent workflows, state management, performance optimization, and comprehensive project monitoring.
+A Rust development companion that enhances cargo with intelligent workflows, state management, performance optimization, and comprehensive project monitoring. W.I.P. UNDER DEVELOPMENT!
 
 ## Table of Contents
-
 - [Quick Start](#-quick-start)
 - [Command Reference](#-command-reference)
-  - [Version Commands](#version-commands)
-  - [View Commands](#view-commands)
-  - [Log Commands](#log-commands)
-  - [Journey Commands](#journey-commands)
-  - [Anchor Commands](#anchor-commands)
-  - [Tide Commands](#tide-commands)
-  - [Scrub Commands](#scrub-commands)
-  - [Map Commands](#map-commands)
-  - [Mutiny Commands](#mutiny-commands)
-  - [Config Commands](#config-commands)
-  - [Optimize Commands](#optimize-commands)
-  - [Checklist Commands](#checklist-commands)
-  - [WTF Commands](#wtf-commands)
-  - [Idea Commands](#idea-commands)
-  - [User Commands](#user-commands)
-  - [Tool Commands](#tool-commands)
-  - [SCAT Commands](#scat-commands-source-code-obfuscation-tool)
-  - [Strip Commands](#strip-commands-code-cleaning--optimization)
-  - [Sweep Commands](#sweep-commands-ai-debug-statement-cleanup)
-  - [DDR Commands](#ddr-commands-docker-dock-rust---parallel-build-orchestration--under-development)
-  - [General Commands](#general-commands)
-- [Installation](#-installation)
-- [Configuration](#️-configuration)
-- [Examples](#-examples)
+    - [Installation](#-installation)
+    - [Version Commands](#version-commands)
+    - [View Commands](#view-commands)
+    - [Log Commands](#captains-log-commands-natural-language-build-notes-with-automatic-tagging-and-search)
+    - [Journey Commands](#journey-commands)
+    - [Anchor Commands](#anchor-commands)
+    - [Tide Commands](#tide-commands)
+    - [Scrub Commands](#scrub-commands)
+    - [SCAT Commands](#scat-commands-source-code-obfuscation-tool-still-under-development)
+    - [Strip Commands](#strip-commands-code-cleaning--optimization)
+    - [Sweep Commands](#sweep-commands-ai-debug-statement-cleanup)
+    - [Map Commands](#map-commands)
+    - [Probe Commands](#probe-commands-intelligent-probe-suite-management)
+    - [Mutiny Commands](#mutiny-commands)
+    - [Config Commands](#config-commands)
+    - [Optimize Commands](#optimize-commands)
+    - [Checklist Commands](#checklist-commands)
+    - [WTF Commands](#wtf-commands-cargomate-ai---pro-only)
+    - [Tool Commands](#tool-commands)
+    - [DDR Commands](#ddr-commands-docker-dock-rust---parallel-build-orchestration--under-development)
+    - [General Commands](#general-commands)
+- [Project Configuration (.cg)](#project-configuration-cg)
+- [Global Configuration (~/.shipwreck/config.toml)](#global-configuration-shipwreckconfigtoml)
+- [Examples](#some-examples)
 - [License](#-license)
 
-## 🚀 Installation
+## 🚀 Installation : CARGO INSTALL CARGO-MATE 
 
 ### Option 1: Quick & Dirty Installer (Recommended - Works Everywhere... in Theory)
 ```bash
@@ -92,8 +91,8 @@ tar -xzf cargo-mate-windows-i686.tar.gz
 cd cargo-mate-windows-i686
 # Run install.ps1 in PowerShell as Administrator
 
-# Universal Linux (latest musl, portable)
-wget https://get.cargo.do/latest-musl.tar.gz -O cargo-mate-latest-musl.tar.gz
+# Universal ALL PLATFORMS AVAILABLE (most of the time contains all)
+wget https://get.cargo.do/latest.tar.gz -O cargo-mate-latest.tar.gz
 tar -xzf cargo-mate-latest-musl.tar.gz
 cd cargo-mate-latest-musl
 sudo ./install.sh
@@ -202,6 +201,65 @@ cm scrub run --interactive -i             # Ask before cleaning each project
 cm scrub run --exclude -e <pattern>       # Exclude directories matching patterns (multiple)
 cm scrub run --stats-only                 # Only show statistics without cleaning
 
+
+### SCAT Commands (Source Code Obfuscation Tool) STILL UNDER DEVELOPMENT
+```bash
+cm scat                    # Display overview of SCAT obfuscation capabilities
+cm scat names <PATH>       # Obfuscate file/folder names with mapping file
+cm scat code <PATH>        # Obfuscate Rust identifiers while preserving functionality
+cm scat strings <PATH>     # Scramble string literals with encryption key
+cm scat pack <INPUT> <OUTPUT> # Pack files into obfuscated bundle
+cm scat unpack <INPUT> <MAP> # Reverse obfuscation using mapping files
+
+# Examples:
+cm scat names src/ --map name_mapping.json --sequential
+cm scat code src/ --preserve-pub --min-len 3 --map code_mapping.json
+cm scat strings src/ --key "contest_key" --map strings.json
+cm scat pack src/ contest.bundle --compress
+cm scat unpack obfuscated/ name_mapping.json --output original/
+```
+
+### Strip Commands (Code Cleaning & Optimization)
+```bash
+cm strip <INPUT>           # Remove comments and non-essential elements from Rust files
+cm strip --tease           # strips maticulously comments and blank lines by file or directory 
+cm strip <INPUT> -o <FILE> # Strip to output file (defaults to stdout)
+cm strip <INPUT> -r        # Process directory recursively
+cm strip <INPUT> -b        # Remove blank lines
+cm strip <INPUT> -a        # Aggressive mode: maximum stripping
+cm strip <INPUT> --minify  # Minify to single line where possible
+cm strip <INPUT> --strip-attrs # Remove all attributes (#[...])
+cm strip <INPUT> --strip-docs  # Remove documentation comments
+
+# Examples:
+cm strip src/main.rs --output main.stripped.rs
+cm strip src/ -r --aggressive --backup
+cm strip src/ --recursive --strip-docs --minify
+cm strip src/main.rs --force --output src/main.rs
+```
+
+### Sweep Commands (AI Debug Statement Cleanup)
+```bash
+cm sweep                    # Display overview of sweep capabilities for cleaning AI debug statements
+cm sweep scan              # Scan for println!, eprintln!, and dbg! statements
+cm sweep sweep [options]   # Clean up debug statements with intelligent pattern recognition
+cm sweep convert           # Convert debug prints to proper logging statements
+cm sweep analyze           # Analyze debug statement patterns and statistics
+cm sweep init              # Initialize sweep configuration file
+
+# Sweep Options:
+cm sweep sweep -n          # Dry run (show what would be removed)
+cm sweep sweep -p          # Interactive mode with pattern memory learning
+cm sweep sweep -y          # Auto-approve all removals
+cm sweep sweep -i          # Interactive confirmation for each statement
+cm sweep sweep --backup    # Create backup files before cleaning
+
+# Examples:
+cm sweep sweep -p          # Learn patterns and clean interactively
+cm sweep sweep -y          # Quick cleanup of all AI debug statements
+cm sweep analyze --top 20  # Show top 20 files with most debug statements
+```
+
 ### Map Commands
 ```bash
 cm map                     # Display overview of dependency visualization and analysis tools
@@ -209,6 +267,52 @@ cm map show                # Present interactive visual representation of projec
 cm map analyze             # Perform comprehensive analysis of project structure and dependencies
 cm map export <path>       # Save dependency map data to external file format for documentation
 cm map path <from> <to>    # Show the specific dependency path connecting two specified components
+```
+
+### Probe Commands (Intelligent Probe Suite Management)
+```bash
+cm probe flake [options]    # Detect flaky probes that pass/fail inconsistently across multiple runs
+cm probe impact [options]   # Run only probes affected by recent Git changes for faster feedback
+cm probe coverage [options] # Generate coverage reports with automatic backend detection
+cm probe profile [options]  # Measure execution time of individual probes with optional flamegraphs
+cm probe tag [options]      # Custom probe categorization and selective execution using tags
+cm probe ci-gen [options]   # One-click generation of CI pipelines that integrate Cargo-Mate probe commands
+cm probe env [options]      # Manage Docker containers for probe dependencies (databases, services, etc.)
+cm probe replay [options]   # Deterministically replay failed probe runs from saved snapshots
+cm probe order [options]    # Detect probe ordering dependencies by randomizing execution sequence
+cm probe doc [options]      # Generate comprehensive markdown documentation of all probes
+
+# Flaky Probe Detection
+cm probe flake -i 30 -j 8 --threshold 95  # Run each probe 30 times with 8 parallel workers, fail if pass-rate below 95%
+
+# Impact Analysis
+cm probe impact --base origin/main --head HEAD  # Run only probes affected by recent changes
+
+# Coverage Analysis
+cm probe coverage --open --threshold 85.0  # Generate coverage report and open in browser, fail if below 85%
+
+# Performance Profiling
+cm probe profile --top 15 --flamegraph slow.svg  # Profile slowest 15 probes and generate flamegraph
+
+# Tag-Based Filtering
+cm probe tag slow network        # Run probes tagged with both "slow" AND "network"
+cm probe tag --exclude flaky     # Run all probes except those tagged "flaky"
+cm probe tag --list              # List all available tags
+
+# CI Configuration Generation
+cm probe ci-gen --platform github --coverage --flake-detect --profile > .github/workflows/ci.yml
+
+# Docker Environment Management
+cm probe env up && cm probe env run && cm probe env down  # Start services, run probes, cleanup
+
+# Failure Reproduction
+cm probe replay 2024-09-25T14:30:15Z  # Replay failed probe run deterministically
+
+# Randomized Execution Order
+cm probe order --random --repeat 3  # Detect ordering dependencies by randomizing sequence
+
+# Documentation Generation
+cm probe doc -o PROBES.md --include-private  # Generate comprehensive probe documentation
 ```
 
 ### Mutiny Commands
@@ -290,64 +394,6 @@ cm tool dep-audit --strict --check-security --licenses "MIT,Apache-2.0"
 
 cm tool test-gen --file <path> --type <unit|integration|property>
     # Generate test boilerplate from Rust function signatures
-```
-
-### SCAT Commands (Source Code Obfuscation Tool) STILL UNDER DEVELOPMENT
-```bash
-cm scat                    # Display overview of SCAT obfuscation capabilities
-cm scat names <PATH>       # Obfuscate file/folder names with mapping file
-cm scat code <PATH>        # Obfuscate Rust identifiers while preserving functionality
-cm scat strings <PATH>     # Scramble string literals with encryption key
-cm scat pack <INPUT> <OUTPUT> # Pack files into obfuscated bundle
-cm scat unpack <INPUT> <MAP> # Reverse obfuscation using mapping files
-
-# Examples:
-cm scat names src/ --map name_mapping.json --sequential
-cm scat code src/ --preserve-pub --min-len 3 --map code_mapping.json
-cm scat strings src/ --key "contest_key" --map strings.json
-cm scat pack src/ contest.bundle --compress
-cm scat unpack obfuscated/ name_mapping.json --output original/
-```
-
-### Strip Commands (Code Cleaning & Optimization)
-```bash
-cm strip <INPUT>           # Remove comments and non-essential elements from Rust files
-cm strip --tease           # strips maticulously comments and blank lines by file or directory 
-cm strip <INPUT> -o <FILE> # Strip to output file (defaults to stdout)
-cm strip <INPUT> -r        # Process directory recursively
-cm strip <INPUT> -b        # Remove blank lines
-cm strip <INPUT> -a        # Aggressive mode: maximum stripping
-cm strip <INPUT> --minify  # Minify to single line where possible
-cm strip <INPUT> --strip-attrs # Remove all attributes (#[...])
-cm strip <INPUT> --strip-docs  # Remove documentation comments
-
-# Examples:
-cm strip src/main.rs --output main.stripped.rs
-cm strip src/ -r --aggressive --backup
-cm strip src/ --recursive --strip-docs --minify
-cm strip src/main.rs --force --output src/main.rs
-```
-
-### Sweep Commands (AI Debug Statement Cleanup)
-```bash
-cm sweep                    # Display overview of sweep capabilities for cleaning AI debug statements
-cm sweep scan              # Scan for println!, eprintln!, and dbg! statements
-cm sweep sweep [options]   # Clean up debug statements with intelligent pattern recognition
-cm sweep convert           # Convert debug prints to proper logging statements
-cm sweep analyze           # Analyze debug statement patterns and statistics
-cm sweep init              # Initialize sweep configuration file
-
-# Sweep Options:
-cm sweep sweep -n          # Dry run (show what would be removed)
-cm sweep sweep -p          # Interactive mode with pattern memory learning
-cm sweep sweep -y          # Auto-approve all removals
-cm sweep sweep -i          # Interactive confirmation for each statement
-cm sweep sweep --backup    # Create backup files before cleaning
-
-# Examples:
-cm sweep sweep -p          # Learn patterns and clean interactively
-cm sweep sweep -y          # Quick cleanup of all AI debug statements
-cm sweep analyze --top 20  # Show top 20 files with most debug statements
 ```
 
 ### DDR Commands (Docker Dock Rust - Parallel Build Orchestration) 🚧 UNDER DEVELOPMENT

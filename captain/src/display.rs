@@ -711,7 +711,7 @@ fn record_build_metrics(
         let dependencies_compiled = get_dependencies_compiled();
         let crate_units_compiled = get_crate_units_compiled();
         let metrics = BuildMetrics {
-            timestamp: Utc::now().to_string(),
+            timestamp: Utc::now(),
             command,
             duration_seconds: elapsed.as_secs_f64(),
             success,
@@ -724,12 +724,6 @@ fn record_build_metrics(
             crate_units_compiled: crate_units_compiled.try_into().unwrap(),
             memory_peak_mb: None,
             cpu_usage_percent: None,
-            average_build_time: 0.0,
-            failed_builds: 0,
-            improvement_trend: "stable".to_string(),
-            total_builds: 1,
-            successful_builds: if success { 1 } else { 0 },
-            top_errors: Vec::new(),
         };
         if let Err(e) = tide.record_build(metrics) {
             eprintln!("⚠️  Failed to record build metrics: {}", e);
@@ -810,7 +804,7 @@ pub fn check_first_mate_monitor(command: &str) -> Result<bool, anyhow::Error> {
         "🥽 First mate monitoring command '{}' - all hands report!", command.cyan()
     );
     let license_manager = license::LicenseManager::new();
-    match license_manager.enforce_license(command) {
+    match license_manager?.enforce_license(command) {
         Ok(_) => {
             println!(
                 "✅ First mate reports: Command '{}' cleared for action!", command

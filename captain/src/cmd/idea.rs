@@ -12,12 +12,11 @@ struct IdeaHistoryEntry {
 }
 pub fn handle_idea(idea: &str) -> Result<()> {
     let license_manager = crate::captain::license::LicenseManager::new();
-    match license_manager.enforce_license("idea") {
-        Ok(true) => {
+    match license_manager?.enforce_license("idea") {
+        Ok(_) => {
             println!("💡 Idea: {}", idea);
             Ok(())
         }
-        Ok(false) => Err(anyhow::anyhow!("License check failed")),
         Err(e) => Err(e),
     }
 }

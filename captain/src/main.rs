@@ -18,11 +18,12 @@ use cargo_mate::cmd::{
     init, help, log, map, mutiny, config, version, view, test, optimize, checklist,
     activate, journey, idea, tool, scrub, sweep, anchor, captain, tide, ddr,
 };
+use cargo_mate::probe;
 use cargo_mate::scat;
 use cargo_mate::cmd::smune::DockDockRustCommands;
 use cargo_mate::cmd::ddr::DdrAction;
 use cargo_mate::captain::{
-    config::ConfigManager, embedder, wtf, license::LicenseManager,
+    config::ConfigManager, wtf, license::LicenseManager,
     shell_integration::ShellIntegration, captain_status,
 };
 use cargo_mate::history;
@@ -30,6 +31,7 @@ use cargo_mate::strip;
 use cargo_mate::admin_msg;
 use cargo_mate::sweeping;
 use cargo_mate::journey::JourneyPlayer;
+use cargo_mate::display;
 mod tools;
 mod command_factory;
 mod progress;
@@ -65,7 +67,7 @@ async fn run() -> Result<()> {
         match command {
             Commands::Register { .. } => {}
             _ => {
-                let license_manager = LicenseManager::new();
+                let license_manager = LicenseManager::new()?;
                 match command {
                     Commands::Init => {
                         license_manager.enforce_license("init")?;
@@ -99,6 +101,9 @@ async fn run() -> Result<()> {
                     }
                     Commands::Test => {
                         license_manager.enforce_license("test")?;
+                    }
+                    Commands::Probe { .. } => {
+                        license_manager.enforce_license("probe")?;
                     }
                     Commands::Optimize { .. } => {
                         license_manager.enforce_license("optimize")?;
@@ -134,9 +139,7 @@ async fn run() -> Result<()> {
                     Commands::Debug => {
                         license_manager.enforce_license("debug")?;
                     }
-                    Commands::Strip(_) => {
-                        license_manager.enforce_license("strip")?;
-                    }
+                    Commands::Strip(_) => {}
                     Commands::Scat { .. } => {
                         license_manager.enforce_license("scat")?;
                     }
@@ -206,6 +209,7 @@ fn execute_command(command: Commands) -> Result<()> {
         Commands::Version { action } => version::handle_version(action),
         Commands::View { action } => view::handle_view(action),
         Commands::Test => test::handle_test(),
+        Commands::Probe { action } => probe::handle_probe(action),
         Commands::Optimize { action } => optimize::handle_optimize(action),
         Commands::Checklist { action } => checklist::handle_checklist_internal(action),
         Commands::History { kind, limit } => {
@@ -243,17 +247,20 @@ fn execute_command(command: Commands) -> Result<()> {
         Commands::Activate => activate::handle_activate(),
         Commands::Exec { cargo_args } => {
             let args_refs: Vec<&str> = cargo_args.iter().map(|s| s.as_str()).collect();
-            let output = embedder::extract_and_execute_captain(&args_refs)?;
-            println!("{:?}", output);
+            display::run_cargo_with_display(&args_refs);
             Ok(())
         }
         Commands::Register { license_key, status, remaining } => {
             let mut config = ConfigManager::new()?;
-            let mut settings = HashMap::new();
-            settings.insert("license.key".to_string(), license_key.unwrap_or_default());
-            settings.insert("license.status".to_string(), status.to_string());
-            settings.insert("license.remaining".to_string(), remaining.to_string());
-            config.save(settings)?;
+            if let Some(key) = license_key {
+                config.set("license.key", &key, true)?;
+            }
+            if status {
+                config.set("license.status", "true", true)?;
+            }
+            if remaining {
+                config.set("license.remaining", "true", true)?;
+            }
             Ok(())
         }
         Commands::Idea { idea } => idea::handle_idea(&idea),

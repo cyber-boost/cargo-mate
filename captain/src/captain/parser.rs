@@ -1,31 +1,10 @@
 use serde::{Deserialize, Serialize};
 use std::fmt;
-use std::process::Command;
-use anyhow::{Context, Result};
-use colored::*;
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct ParsedError {
-    pub code: String,
-    pub file: String,
-    pub line: usize,
-    pub message: String,
-}
-impl fmt::Display for ParsedError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "[{}] {}:{} - {}", self.code, self.file, self.line, self.message)
-    }
-}
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct ParsedWarning {
-    pub code: String,
-    pub file: String,
-    pub line: usize,
-    pub message: String,
-}
-impl fmt::Display for ParsedWarning {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "[{}] {}:{} - {}", self.code, self.file, self.line, self.message)
-    }
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct CargoMessage {
+    pub reason: String,
+    #[serde(flatten)]
+    pub data: MessageData,
 }
 #[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(untagged)]
@@ -99,15 +78,34 @@ pub struct ArtifactProfile {
     pub debuginfo: Option<u32>,
     pub test: bool,
 }
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ParsedError {
+    pub code: String,
+    pub file: String,
+    pub line: usize,
+    pub message: String,
+}
+impl fmt::Display for ParsedError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "[{}] {}:{} - {}", self.code, self.file, self.line, self.message)
+    }
+}
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ParsedWarning {
+    pub code: String,
+    pub file: String,
+    pub line: usize,
+    pub message: String,
+}
+impl fmt::Display for ParsedWarning {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "[{}] {}:{} - {}", self.code, self.file, self.line, self.message)
+    }
+}
 pub fn parse_cargo_message(line: &str) -> Option<CargoMessage> {
-    println!("🔍 {}", "Parsing cargo message requires captain binary".bright_blue());
-    delegate_to_captain(vec!["parser", "parse", line])
-        .ok()
-        .and_then(|_| serde_json::from_str(line).ok())
+    serde_json::from_str(line).ok()
 }
 pub fn format_error(msg: &DiagnosticMessage) -> ParsedError {
-    println!("🔍 {}", "Formatting error requires captain binary".bright_blue());
-    delegate_to_captain(vec!["parser", "format", "error", & msg.message]).ok();
     let code = msg
         .code
         .as_ref()
@@ -126,8 +124,6 @@ pub fn format_error(msg: &DiagnosticMessage) -> ParsedError {
     }
 }
 pub fn format_warning(msg: &DiagnosticMessage) -> ParsedWarning {
-    println!("🔍 {}", "Formatting warning requires captain binary".bright_blue());
-    delegate_to_captain(vec!["parser", "format", "warning", & msg.message]).ok();
     let code = msg
         .code
         .as_ref()
@@ -144,57 +140,4 @@ pub fn format_warning(msg: &DiagnosticMessage) -> ParsedWarning {
         line,
         message: msg.message.clone(),
     }
-}
-pub fn delegate_to_captain(args: Vec<&str>) -> Result<()> {
-    let captain_path = match crate::captain::captain_status::find_captain_binary() {
-        Some(path) => path,
-        None => {
-            println!("❌ {}", "Advanced captain binary not found".red().bold());
-            println!(
-                "🔄 {}", "Auto-downloading captain binary from get.cargo.do/".cyan()
-            );
-            match crate::captain::captain_status::auto_download_captain() {
-                Ok(path) => path,
-                Err(e) => {
-                    println!(
-                        "❌ {}", format!("Failed to download captain: {}", e) .red()
-                    );
-                    println!("💡 {}", "Please run: cm captain install".cyan());
-                    println!("   Or upgrade at: https://cargo.do/pro");
-                    println!();
-                    println!(
-                        "💡 {}", "Parser features require the captain binary:".cyan()
-                    );
-                    println!("   • Advanced cargo message parsing");
-                    println!("   • Error and warning formatting");
-                    println!("   • Compiler artifact analysis");
-                    println!("   • Build script execution tracking");
-                    return Ok(());
-                }
-            }
-        }
-    };
-    let output = Command::new(&captain_path)
-        .args(&args)
-        .output()
-        .context("Failed to execute captain binary for parsing")?;
-    if !output.stdout.is_empty() {
-        print!("{}", String::from_utf8_lossy(& output.stdout));
-    }
-    if !output.stderr.is_empty() {
-        eprint!("{}", String::from_utf8_lossy(& output.stderr));
-    }
-    if !output.status.success() {
-        println!(
-            "❌ {}", format!("Captain binary exited with status: {}", output.status)
-            .red()
-        );
-    }
-    Ok(())
-}
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct CargoMessage {
-    pub reason: String,
-    #[serde(flatten)]
-    pub data: MessageData,
 }

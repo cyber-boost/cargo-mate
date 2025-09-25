@@ -11,7 +11,7 @@ pub fn handle_tide(action: TideAction) -> Result<()> {
             charts.analyze_dependencies()?;
         }
         TideAction::Export { path } => {
-            charts.export_csv(path.to_string_lossy().as_ref())?;
+            charts.export_csv(&path)?;
         }
     }
     Ok(())

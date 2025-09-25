@@ -1070,7 +1070,7 @@ pub fn check_buoy_clearance(command: &str) -> Result<bool> {
         .cyan()
     );
     let license_manager = license::LicenseManager::new();
-    match license_manager.enforce_license(command) {
+    match license_manager?.enforce_license(command) {
         Ok(_) => {
             println!(
                 "✅ Clear sailing! Command '{}' passed all navigation buoys!", command

@@ -9,10 +9,10 @@ use crate::captain::wtf;
 use crate::captain::version;
 use crate::display;
 use crate::captain::captain_log;
-pub fn run_cargo_with_wrapper(args: &[&str]) {
+pub fn run_cargo_with_wrapper(args: &[&str]) -> Result<()> {
     if !args.is_empty() {
         let license_manager = crate::captain::license::LicenseManager::new();
-        if let Err(e) = license_manager.enforce_license(&format!("cargo-{}", args[0])) {
+        if let Err(e) = license_manager?.enforce_license(&format!("cargo-{}", args[0])) {
             eprintln!("❌ License enforcement failed: {}", e);
             crate::captain::wtf::display_api_failure_art();
             std::process::exit(1);
@@ -22,23 +22,24 @@ pub fn run_cargo_with_wrapper(args: &[&str]) {
         eprintln!("⚠️  Version auto-increment failed: {}", e);
     }
     display::run_cargo_with_display(args);
-    if let Ok(mut log) = captain_log::CaptainLogger::new() {
+    if let Ok(mut log) = captain_log::CaptainLog::new() {
         let build_result = captain_log::BuildResult {
             success: true,
             error_count: 0,
             warning_count: 0,
             duration_seconds: 0.0,
-            command: format!("cargo {}", args.join(" ")),
-            timestamp: chrono::Utc::now().to_string(),
         };
-        if let Err(e) = log.log_command(&format!("cargo {}", args.join(" ")), &[]) {
+        if let Err(e) = log
+            .log_command(&format!("cargo {}", args.join(" ")), build_result)
+        {
             eprintln!("⚠️  Captain's Log recording failed: {}", e);
         }
         println!("\n📝 {}", "Captain's Log: Session recorded".dimmed());
     }
-    if let Err(e) = version::post_operation_hook(None) {
+    if let Err(e) = version::post_operation_hook(None, true) {
         eprintln!("⚠️  Version post-operation hook failed: {}", e);
     }
+    Ok(())
 }
 pub fn run_tracked_command(command: &str, session_id: &str) -> Result<()> {
     use std::process::Command;
@@ -94,13 +95,15 @@ pub fn run_tracked_command(command: &str, session_id: &str) -> Result<()> {
         error_count: 0,
         warning_count: 0,
         duration_seconds: duration.as_secs_f64(),
-        command: command.to_string(),
-        timestamp: chrono::Utc::now().to_string(),
     };
-    log.log_command(command, &[])?;
+    log.log_command(command, build_result)?;
     println!("\n🔍 Analysis:");
     let entries = log.get_recent(1000);
-    let detector = captain_log::PatternDetector::new(entries);
+    let entries_owned: Vec<captain_log::LogEntry> = entries
+        .into_iter()
+        .cloned()
+        .collect();
+    let detector = captain_log::PatternDetector::new(entries_owned);
     let recurring = detector.find_recurring_errors();
     if !recurring.is_empty() {
         println!("\n⚠️  Recurring Issues:");
@@ -184,15 +187,14 @@ pub fn is_cm_command(cmd: &str) -> bool {
         "tools" | "strip" | "scat"
     )
 }
-pub fn handle_license_check(command: &str) -> Result<bool> {
+pub fn handle_license_check(command: &str) -> Result<()> {
     let license_manager = crate::captain::license::LicenseManager::new();
-    license_manager.enforce_license(command)
+    license_manager?.enforce_license(command)
 }
 pub fn check_command_license(command: &str) -> Result<()> {
     let license_manager = crate::captain::license::LicenseManager::new();
-    match license_manager.enforce_license(command) {
-        Ok(true) => Ok(()),
-        Ok(false) => Err(anyhow::anyhow!("License check failed")),
+    match license_manager?.enforce_license(command) {
+        Ok(_) => Ok(()),
         Err(e) => Err(e),
     }
 }

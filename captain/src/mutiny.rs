@@ -309,7 +309,7 @@ pub fn check_helmsman_direction(command: &str) -> Result<bool> {
         .cyan()
     );
     let license_manager = license::LicenseManager::new();
-    match license_manager.enforce_license(command) {
+    match license_manager?.enforce_license(command) {
         Ok(_) => {
             println!(
                 "✅ Helmsman reports: Command '{}' on correct heading!", command.green()
