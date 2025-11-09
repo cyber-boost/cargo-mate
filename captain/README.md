@@ -6,109 +6,37 @@ A Rust development companion that enhances cargo with intelligent workflows, sta
 
 ## Table of Contents
 - [Quick Start](#-quick-start)
+- [Installation](#-installation)
 - [Command Reference](#-command-reference)
-    - [Installation](#-installation)
     - [Version Commands](#version-commands)
     - [View Commands](#view-commands)
     - [Log Commands](#captains-log-commands-natural-language-build-notes-with-automatic-tagging-and-search)
     - [Journey Commands](#journey-commands)
     - [Anchor Commands](#anchor-commands)
     - [Tide Commands](#tide-commands)
+    - [Deps Commands](#deps-commands)
+    - [LIBerate Commands](#liberate-commands)
+    - [Tree Commands](#tree-commands)
+    - [Stub Commands](#stub-commands)
+    - [Bin Commands](#bin-commands)
     - [Scrub Commands](#scrub-commands)
-    - [SCAT Commands](#scat-commands-source-code-obfuscation-tool-still-under-development)
-    - [Strip Commands](#strip-commands-code-cleaning--optimization)
-    - [Sweep Commands](#sweep-commands-ai-debug-statement-cleanup)
-    - [Map Commands](#map-commands)
+    - [SCAT Commands](#scat-commands-source-code-obfuscation-tool-still-under-development---scat-at-your-own-risk)
+    - [Strip Commands](#strip-commands-code-cleaning--optimization---sometimes-tease-hurts)
+    - [Sweep Commands](#sweep-commands-ai-debug-statement-cleanup---clean-up)
+    - [Map Commands](#map-commands---where-am-i)
     - [Probe Commands](#probe-commands-intelligent-probe-suite-management)
-    - [Mutiny Commands](#mutiny-commands)
-    - [Config Commands](#config-commands)
-    - [Optimize Commands](#optimize-commands)
-    - [Checklist Commands](#checklist-commands)
-    - [WTF Commands](#wtf-commands-cargomate-ai---pro-only)
-    - [Tool Commands](#tool-commands)
+    - [Mutiny Commands](#mutiny-commands---this-is-still-dumb)
+    - [Config Commands](#config-commands---configure-your-ship)
+    - [Optimize Commands](#optimize-commands---optimize-cm)
+    - [Checklist Commands](#checklist-commands---stay-focused-and-touch-grass)
+    - [WTF Commands](#wtf-commands-cargomate-ai---pro-only---only-works-25-of-the-time)
+    - [Tool Commands](#tool-commands---tools-are-just-helper-files--base-files-for-you-to-use-if-wanted)
     - [DDR Commands](#ddr-commands-docker-dock-rust---parallel-build-orchestration--under-development)
     - [General Commands](#general-commands)
 - [Project Configuration (.cg)](#project-configuration-cg)
 - [Global Configuration (~/.shipwreck/config.toml)](#global-configuration-shipwreckconfigtoml)
 - [Examples](#some-examples)
 - [License](#-license)
-
-## 🚀 Installation : CARGO INSTALL CARGO-MATE 
-
-### Option 1: Quick & Dirty Installer (Recommended - Works Everywhere... in Theory)
-```bash
-curl -sSL https://get.cargo.do/mate | bash
-```
-✅ No compilation needed, auto-detects platform, handles all dependencies
-
-### Option 2: Control & Freaky (Direct Download - Choose Your Platform and Speed)
-```bash
-# Linux x86_64 (glibc)
-wget https://get.cargo.do/linux-x86-64.tar.gz -O cargo-mate-linux-x86-64.tar.gz
-tar -xzf cargo-mate-linux-x86-64.tar.gz
-cd cargo-mate-linux-x86_64
-sudo ./install.sh
-
-# Linux x86_64 (musl)
-wget https://get.cargo.do/linux-x86-64-musl.tar.gz -O cargo-mate-linux-x86-64-musl.tar.gz
-tar -xzf cargo-mate-linux-x86-64-musl.tar.gz
-cd cargo-mate-linux-x86_64-musl
-sudo ./install.sh
-
-# Linux ARM64 (glibc)
-wget https://get.cargo.do/linux-arm64.tar.gz -O cargo-mate-linux-arm64.tar.gz
-tar -xzf cargo-mate-linux-arm64.tar.gz
-cd cargo-mate-linux-aarch64
-sudo ./install.sh
-
-# Linux ARM64 (musl)
-wget https://get.cargo.do/linux-arm64-musl.tar.gz -O cargo-mate-linux-arm64-musl.tar.gz
-tar -xzf cargo-mate-linux-arm64-musl.tar.gz
-cd cargo-mate-linux-aarch64-musl
-sudo ./install.sh
-
-# macOS Intel (x86_64)
-wget https://get.cargo.do/macos-x86-64.tar.gz -O cargo-mate-macos-x86-64.tar.gz
-tar -xzf cargo-mate-macos-x86-64.tar.gz
-cd cargo-mate-macos-x86_64
-sudo ./install.sh
-
-# macOS Apple Silicon (ARM64)
-wget https://get.cargo.do/macos-arm64.tar.gz -O cargo-mate-macos-arm64.tar.gz
-tar -xzf cargo-mate-macos-arm64.tar.gz
-cd cargo-mate-macos-aarch64
-sudo ./install.sh
-
-# Windows x86_64
-wget https://get.cargo.do/windows-x86-64.tar.gz -O cargo-mate-windows-x86-64.tar.gz
-tar -xzf cargo-mate-windows-x86-64.tar.gz
-cd cargo-mate-windows-x86_64
-# Run install.ps1 in PowerShell as Administrator
-
-# Windows i686
-wget https://get.cargo.do/windows-i686.tar.gz -O cargo-mate-windows-i686.tar.gz
-tar -xzf cargo-mate-windows-i686.tar.gz
-cd cargo-mate-windows-i686
-# Run install.ps1 in PowerShell as Administrator
-
-# Universal ALL PLATFORMS AVAILABLE (most of the time contains all)
-wget https://get.cargo.do/latest.tar.gz -O cargo-mate-latest.tar.gz
-tar -xzf cargo-mate-latest-musl.tar.gz
-cd cargo-mate-latest-musl
-sudo ./install.sh
-
-### Option 3: Natural & Confused (Requires Build Tools)
-```bash
-# Prerequisites: apt install build-essential (or equivalent)
-cargo install cargo-mate
-cm install && cm activate
-```
-⚠️ **Note**: 20+ minute build time. Requires C compiler/linker. If you get "linker cc not found", use Option 1 or 2 instead.
-
-### Troubleshooting
-- **"linker cc not found"**: Install build-essential first, or use the curl/wget installers
-- **"GLIBC_2.32 not found"**: Use the universal installer (Option 1) which auto-selects compatible version
-- **Behind firewall**: Use Option 2 to download manually
 
 ### Version Commands
 ```bash
@@ -185,8 +113,89 @@ cm tide analyze            # Examine project dependencies and their impact on bu
 cm tide export <path>      # Save performance metrics and analytics data to external file format
 ```
 
-### Scrub Commands
+### Deps Commands
+```bash
+cm deps                    # Analyze project dependencies - find which external crates are actually used vs declared
+cm deps --path <PATH>      # Analyze specific directory (default: current directory)
+cm deps --json             # Output results in JSON format for programmatic consumption
 
+# What it does:
+# - Scans all Rust source files (src/**/*.rs and build.rs)
+# - Extracts use statements and extern crate declarations
+# - Parses Cargo.toml to get declared dependencies
+# - Compares used crates vs declared dependencies
+# - Queries crates.io to verify missing dependencies exist
+# - Reports unused declared dependencies and missing used dependencies
+```
+
+### LIBerate Commands
+```bash
+cm liberate                # Generate lib.rs by scanning all Rust files and extracting public items
+cm liberate -t <PATH>      # Target directory to scan (default: current directory)
+cm liberate -o <PATH>      # Output file path (default: .LIBerate-[timestamp].rs)
+
+# What it does:
+# - Recursively scans project directory for all .rs files
+# - Extracts all public items (structs, enums, functions, constants, types, traits, statics, unions, impl blocks)
+# - Generates module declarations for each file
+# - Creates pub use statements for all public items
+# - Organizes exports by category with helpful comments
+# - Handles errors gracefully with informative warnings
+```
+
+### Tree Commands
+```bash
+cm tree                    # Generate beautiful markdown-formatted directory tree
+cm tree -t <PATH>          # Target directory to scan (default: current directory)
+cm tree -o <PATH>          # Output file path (default: cm-tree-[timestamp].md)
+cm tree --file-size        # Include file sizes
+cm tree --line-count       # Count lines in files
+cm tree --dates            # Include modification dates
+cm tree --style <STYLE>    # Choose style: basic, readme, cm, hard, easy (default: readme)
+cm tree --yolo             # Activate YOLO mode 🎉
+cm tree history            # View all previously generated trees
+cm tree show <name>        # Display a specific tree from history
+cm tree find <query>       # Search through tree history
+```
+
+### Stub Commands
+```bash
+cm stub                    # Scan for stubs, placeholders, TODOs, FIXMEs, and unimplemented code patterns
+cm stub -t <PATH>          # Target directory to scan (default: current directory)
+cm stub -o <PATH>          # Output file path (default: cm-stubs-[timestamp].md)
+cm stub --ext <EXT>        # File extensions to scan (default: rs,py,js,html)
+cm stub --custom <PATTERN> # Custom pattern(s) to search for (comma-separated)
+cm stub --skip <PATTERNS>  # Patterns to skip/exclude (comma-separated)
+cm stub find [<pattern>]   # Search for stubs with optional custom pattern
+cm stub skip <patterns>    # Search while skipping specific patterns
+cm stub history            # View all previously generated stub reports
+cm stub show <name>        # Display a specific stub report from history
+cm stub delete --all       # Delete all stub reports from history
+```
+
+### Bin Commands
+```bash
+cm bin --name <NAME>       # Test binary by name (searches PATH)
+cm bin --path <PATH>       # Test binary by path
+cm bin -o <PATH>           # Output file path (default: cm-bin-{name}-{timestamp}.md)
+cm bin --timeout-seconds <SECONDS>  # Timeout for each command (default: 10)
+cm bin --max-depth <DEPTH> # Maximum number of commands to test
+cm bin history             # View all previously generated test reports
+cm bin show <name>         # Display a specific test report from history
+cm bin find <query>        # Search through test reports
+cm bin delete --all        # Delete all test reports from history
+
+# What it does:
+# - Runs --help, -h, or help to discover commands
+# - Parses help output to extract available commands
+# - For each command, gets its help to extract flags
+# - Tests each command with each flag combination
+# - Collects all outputs, exit codes, and errors
+# - Generates comprehensive markdown report
+```
+
+### Scrub Commands
+```bash
 cm scrub run --directory -d <dir>         # Directory to start searching from (default: current)
 cm scrub run --dry-run -n                 # Show what would be cleaned without actually cleaning
 cm scrub run --verbose -v                 # Enable verbose output
@@ -200,9 +209,9 @@ cm scrub run --export-json <file>         # Export results to JSON file
 cm scrub run --interactive -i             # Ask before cleaning each project
 cm scrub run --exclude -e <pattern>       # Exclude directories matching patterns (multiple)
 cm scrub run --stats-only                 # Only show statistics without cleaning
+```
 
-
-### SCAT Commands (Source Code Obfuscation Tool) STILL UNDER DEVELOPMENT
+### SCAT Commands (Source Code Obfuscation Tool) STILL UNDER DEVELOPMENT - SCAT AT YOUR OWN RISK
 ```bash
 cm scat                    # Display overview of SCAT obfuscation capabilities
 cm scat names <PATH>       # Obfuscate file/folder names with mapping file
@@ -219,7 +228,7 @@ cm scat pack src/ contest.bundle --compress
 cm scat unpack obfuscated/ name_mapping.json --output original/
 ```
 
-### Strip Commands (Code Cleaning & Optimization)
+### Strip Commands (Code Cleaning & Optimization) - SOMETIMES TEASE HURTS
 ```bash
 cm strip <INPUT>           # Remove comments and non-essential elements from Rust files
 cm strip --tease           # strips maticulously comments and blank lines by file or directory 
@@ -238,7 +247,7 @@ cm strip src/ --recursive --strip-docs --minify
 cm strip src/main.rs --force --output src/main.rs
 ```
 
-### Sweep Commands (AI Debug Statement Cleanup)
+### Sweep Commands (AI Debug Statement Cleanup) -- CLEAN UP
 ```bash
 cm sweep                    # Display overview of sweep capabilities for cleaning AI debug statements
 cm sweep scan              # Scan for println!, eprintln!, and dbg! statements
@@ -260,7 +269,7 @@ cm sweep sweep -y          # Quick cleanup of all AI debug statements
 cm sweep analyze --top 20  # Show top 20 files with most debug statements
 ```
 
-### Map Commands
+### Map Commands -- WHERE AM I
 ```bash
 cm map                     # Display overview of dependency visualization and analysis tools
 cm map show                # Present interactive visual representation of project dependency tree
@@ -315,7 +324,7 @@ cm probe order --random --repeat 3  # Detect ordering dependencies by randomizin
 cm probe doc -o PROBES.md --include-private  # Generate comprehensive probe documentation
 ```
 
-### Mutiny Commands
+### Mutiny Commands -- THIS IS STILL DUMB
 ```bash
 cm mutiny                  # Display overview of override capabilities and current mutiny status
 cm mutiny activate <reason> # Enable mutiny mode to bypass cargo restrictions for specified reason
@@ -327,7 +336,7 @@ cm mutiny yolo             # Enable maximum risk mode that disables all safety c
 cm mutiny status           # Display current status of mutiny mode and active overrides
 ```
 
-### Config Commands
+### Config Commands -- CONFIGURE YOUR SHIP
 ```bash
 cm config                  # Display overview of all configuration options and current settings
 cm config set <key> <val>  # Assign a specific value to a configuration key
@@ -338,7 +347,7 @@ cm config shortcut <name>  # Create a custom command shortcut for frequently use
 cm config hook <type>      # Add an automated script that triggers on specific build events
 ```
 
-### Optimize Commands
+### Optimize Commands -- OPTIMIZE CM
 ```bash
 cm optimize                # Display overview of optimization capabilities and current optimization settings
 cm optimize aggressive     # Apply maximum performance optimizations with potential stability trade-offs
@@ -350,7 +359,7 @@ cm optimize recommendations # Analyze project and suggest optimal performance im
 cm optimize restore        # Revert all optimizations and restore original Cargo.toml configuration
 ```
 
-### Checklist Commands
+### Checklist Commands -- STAY FOCUSED AND TOUCH GRASS
 ```bash
 cm checklist               # Show current checklist
 cm checklist show          # Show current checklist
@@ -360,7 +369,7 @@ cm checklist done <items>  # Mark items as done (e.g., "1,2,3" or "1")
 cm checklist clear [target] # Clear checklist items (default: "all", or "done")
 ```
 
-### WTF Commands (CargoMate AI - Pro only)
+### WTF Commands (CargoMate AI - Pro only) -- ONLY WORKS 25% OF THE TIME
 ```bash
 cm wtf                     # Show WTF overview
 cm wtf ask <question>      # Ask CargoMate AI a question
@@ -378,7 +387,7 @@ cm wtf ollama models         # List available Ollama models
 ```
 
 
-### Tool Commands
+### Tool Commands -- TOOLS ARE JUST HELPER FILES / BASE FILES FOR YOU TO USE IF WANTED
 ```bash
 cm tool                    # Show tool system overview
 cm tool list               # List all available tools
@@ -396,7 +405,7 @@ cm tool test-gen --file <path> --type <unit|integration|property>
     # Generate test boilerplate from Rust function signatures
 ```
 
-### DDR Commands (Docker Dock Rust - Parallel Build Orchestration) 🚧 UNDER DEVELOPMENT
+### DDR Commands (Dock Dock Rust - Parallel Build Orchestration) 🚧 UNDER DEVELOPMENT
 ```bash
 cm ddr                     # Display overview of DDR parallel Docker-based Rust build capabilities
 cm ddr build [options]     # Build Rust project using Docker containers with parallel orchestration
@@ -520,9 +529,84 @@ This project is licensed
 
 For more information, visit: [cargo.do/license](https://cargo.do/license)
 
----
+## 🚀 Installation : CARGO INSTALL CARGO-MATE 
 
-Built with ❤️ for the Rust community. 
+### Option 1: Quick & Dirty Installer (Recommended - Works Everywhere... in Theory)
+```bash
+curl -sSL https://get.cargo.do/mate | bash
+```
+✅ No compilation needed, auto-detects platform, handles all dependencies
+
+### Option 2: Control & Freaky (Direct Download - Choose Your Platform and Speed)
+```bash
+# Linux x86_64 (glibc)
+wget https://get.cargo.do/linux-x86-64.tar.gz -O cargo-mate-linux-x86-64.tar.gz
+tar -xzf cargo-mate-linux-x86-64.tar.gz
+cd cargo-mate-linux-x86_64
+sudo ./install.sh
+
+# Linux x86_64 (musl)
+wget https://get.cargo.do/linux-x86-64-musl.tar.gz -O cargo-mate-linux-x86-64-musl.tar.gz
+tar -xzf cargo-mate-linux-x86-64-musl.tar.gz
+cd cargo-mate-linux-x86_64-musl
+sudo ./install.sh
+
+# Linux ARM64 (glibc)
+wget https://get.cargo.do/linux-arm64.tar.gz -O cargo-mate-linux-arm64.tar.gz
+tar -xzf cargo-mate-linux-arm64.tar.gz
+cd cargo-mate-linux-aarch64
+sudo ./install.sh
+
+# Linux ARM64 (musl)
+wget https://get.cargo.do/linux-arm64-musl.tar.gz -O cargo-mate-linux-arm64-musl.tar.gz
+tar -xzf cargo-mate-linux-arm64-musl.tar.gz
+cd cargo-mate-linux-aarch64-musl
+sudo ./install.sh
+
+# macOS Intel (x86_64)
+wget https://get.cargo.do/macos-x86-64.tar.gz -O cargo-mate-macos-x86-64.tar.gz
+tar -xzf cargo-mate-macos-x86-64.tar.gz
+cd cargo-mate-macos-x86_64
+sudo ./install.sh
+
+# macOS Apple Silicon (ARM64)
+wget https://get.cargo.do/macos-arm64.tar.gz -O cargo-mate-macos-arm64.tar.gz
+tar -xzf cargo-mate-macos-arm64.tar.gz
+cd cargo-mate-macos-aarch64
+sudo ./install.sh
+
+# Windows x86_64
+wget https://get.cargo.do/windows-x86-64.tar.gz -O cargo-mate-windows-x86-64.tar.gz
+tar -xzf cargo-mate-windows-x86-64.tar.gz
+cd cargo-mate-windows-x86_64
+# Run install.ps1 in PowerShell as Administrator
+
+# Windows i686
+wget https://get.cargo.do/windows-i686.tar.gz -O cargo-mate-windows-i686.tar.gz
+tar -xzf cargo-mate-windows-i686.tar.gz
+cd cargo-mate-windows-i686
+# Run install.ps1 in PowerShell as Administrator
+
+# Universal ALL PLATFORMS AVAILABLE (most of the time contains all)
+wget https://get.cargo.do/latest.tar.gz -O cargo-mate-latest.tar.gz
+tar -xzf cargo-mate-latest-musl.tar.gz
+cd cargo-mate-latest-musl
+sudo ./install.sh
+
+### Option 3: Natural & Confused (Requires Build Tools)
+```bash
+# Prerequisites: apt install build-essential (or equivalent)
+cargo install cargo-mate
+cm install && cm activate
+```
+⚠️ **Note**: 20+ minute build time. Requires C compiler/linker. If you get "linker cc not found", use Option 1 or 2 instead.
+
+### Troubleshooting
+- **"linker cc not found"**: Install build-essential first, or use the curl/wget installers
+- **"GLIBC_2.32 not found"**: Use the universal installer (Option 1) which auto-selects compatible version
+- **Behind firewall**: Use Option 2 to download manually
+
+
 No more shipwrecks in the sea of cargo errors!
 
 <img src="https://raw.githubusercontent.com/cyber-boost/cargo-mate/3ebf3ef2f9eb64ec41e343a34e90f3a62f84d506/banner.svg" alt="Cargo Mate: Rust development companion" width="600">

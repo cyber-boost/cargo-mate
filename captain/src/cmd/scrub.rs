@@ -1,9 +1,16 @@
 use anyhow::Result;
 use crate::cmd::smune::ScrubAction;
 use crate::scrubme::scrub::{ScrubOptions, CargoScrubber};
+use crate::captain::config::ConfigManager;
 pub fn handle_scrub(action: ScrubAction) -> Result<()> {
     match action {
         ScrubAction::Run { dry_run, verbose, start, resume, min_depth, max_depth } => {
+            let config = ConfigManager::new()?;
+            let auto_git_commit = config.get("version_control.auto_git_commit")
+                .unwrap_or_else(|| "true".to_string())
+                .parse()
+                .unwrap_or(true);
+
             let options = ScrubOptions {
                 dry_run,
                 verbose,
@@ -22,7 +29,7 @@ pub fn handle_scrub(action: ScrubAction) -> Result<()> {
                 encrypted_backups: false,
                 profile: false,
                 html_report: None,
-                git_commit: false,
+                git_commit: auto_git_commit,
                 max_undo_days: 30,
                 ai_detect: false,
             };

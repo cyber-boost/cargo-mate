@@ -16,7 +16,7 @@ use std::process::Output;
 use cargo_mate::cmd::smune::{Args, Commands, JourneyAction};
 use cargo_mate::cmd::{
     init, help, log, map, mutiny, config, version, view, test, optimize, checklist,
-    activate, journey, idea, tool, scrub, sweep, anchor, captain, tide, ddr,
+    activate, journey, idea, tool, scrub, sweep, anchor, captain, tide, ddr, liberate, tree, stub, bin,
 };
 use cargo_mate::probe;
 use cargo_mate::scat;
@@ -32,6 +32,7 @@ use cargo_mate::admin_msg;
 use cargo_mate::sweeping;
 use cargo_mate::journey::JourneyPlayer;
 use cargo_mate::display;
+use cargo_mate::cmd::init::where_the_cm;
 mod tools;
 mod command_factory;
 mod progress;
@@ -47,6 +48,7 @@ async fn main() -> Result<()> {
 }
 async fn run() -> Result<()> {
     init::ensure_initialized();
+    where_the_cm();
     let args = Args::parse();
     if !matches!(args.command, Some(Commands::Register { .. }) | None) {
         let should_check = match &args.command {
@@ -54,18 +56,18 @@ async fn run() -> Result<()> {
             None => true,
         };
         if should_check {
-            std::thread::spawn(|| {
-                let runtime = tokio::runtime::Runtime::new().unwrap();
-                runtime
-                    .block_on(async {
-                        let _ = admin_msg::check_and_display_message().await;
-                    });
+            tokio::spawn(async move {
+                let _ = admin_msg::check_and_display_message().await;
             });
         }
     }
     if let Some(ref command) = args.command {
         match command {
             Commands::Register { .. } => {}
+            Commands::Exec { .. } => {
+                // Skip license check entirely for exec - it's called very frequently
+                // and blocking would cause significant delays (15-30s on Mac)
+            }
             _ => {
                 let license_manager = LicenseManager::new()?;
                 match command {
@@ -97,7 +99,11 @@ async fn run() -> Result<()> {
                         license_manager.enforce_license("version")?;
                     }
                     Commands::View { .. } => {
-                        license_manager.enforce_license("view")?;
+                        tokio::task::spawn_blocking(|| -> anyhow::Result<()> {
+                            let lm = LicenseManager::new()?;
+                            lm.enforce_license("view")
+                        })
+                        .await??;
                     }
                     Commands::Test => {
                         license_manager.enforce_license("test")?;
@@ -124,9 +130,6 @@ async fn run() -> Result<()> {
                     Commands::Activate => {
                         license_manager.enforce_license("activate")?;
                     }
-                    Commands::Exec { .. } => {
-                        license_manager.enforce_license("exec")?;
-                    }
                     Commands::Idea { .. } => {
                         license_manager.enforce_license("idea")?;
                     }
@@ -149,13 +152,32 @@ async fn run() -> Result<()> {
                     Commands::Ddr { .. } => {
                         license_manager.enforce_license("ddr")?;
                     }
+                    Commands::Deps { .. } => {
+                        tokio::task::spawn_blocking(|| -> anyhow::Result<()> {
+                            let lm = LicenseManager::new()?;
+                            lm.enforce_license("deps")
+                        })
+                        .await??;
+                    }
+                    Commands::Liberate { .. } => {
+                        license_manager.enforce_license("liberate")?;
+                    }
+                    Commands::Tree { .. } => {
+                        license_manager.enforce_license("tree")?;
+                    }
+                    Commands::Stub { .. } => {
+                        license_manager.enforce_license("stub")?;
+                    }
+                    Commands::Bin { .. } => {
+                        license_manager.enforce_license("bin")?;
+                    }
                     Commands::Register { .. } => {}
                 }
             }
         }
     }
     match args.command {
-        Some(command) => execute_command(command),
+        Some(command) => execute_command(command).await,
         None => handle_default_command(),
     }
 }
@@ -195,7 +217,7 @@ fn format_command(args: &Args) -> String {
         None => "cargo build".to_string(),
     }
 }
-fn execute_command(command: Commands) -> Result<()> {
+async fn execute_command(command: Commands) -> Result<()> {
     let factory = command_factory::CommandFactory::new();
     match command {
         Commands::Init => init::handle_init(),
@@ -217,39 +239,22 @@ fn execute_command(command: Commands) -> Result<()> {
             history::show_history(&args);
             Ok(())
         }
-        Commands::Ddr { action } => {
-            let runtime = tokio::runtime::Runtime::new()?;
-            runtime
-                .block_on(async {
-                    match action {
-                        DockDockRustCommands::DockDockRust {
-                            image,
-                            target,
-                            jobs,
-                            config,
-                            ..
-                        } => {
-                            let ddr_action = DdrAction::Build {
-                                image: Some(image),
-                                target,
-                                jobs,
-                                config,
-                                use_config: false,
-                            };
-                            ddr::handle_ddr(Some(ddr_action)).await
-                        }
-                    }
-                })
-        }
+        Commands::Ddr { action } => match action {
+            DockDockRustCommands::DockDockRust { image, target, jobs, config, .. } => {
+                let ddr_action = DdrAction::Build {
+                    image: Some(image),
+                    target,
+                    jobs,
+                    config,
+                    use_config: false,
+                };
+                ddr::handle_ddr(Some(ddr_action)).await
+            }
+        },
         Commands::Scrub { action } => scrub::handle_scrub(action),
         Commands::Sweep { action } => sweep::handle_sweep(action),
         Commands::Install => activate::handle_install(),
         Commands::Activate => activate::handle_activate(),
-        Commands::Exec { cargo_args } => {
-            let args_refs: Vec<&str> = cargo_args.iter().map(|s| s.as_str()).collect();
-            display::run_cargo_with_display(&args_refs);
-            Ok(())
-        }
         Commands::Register { license_key, status, remaining } => {
             let mut config = ConfigManager::new()?;
             if let Some(key) = license_key {
@@ -273,9 +278,60 @@ fn execute_command(command: Commands) -> Result<()> {
             println!("🔍 Debug mode enabled");
             Ok(())
         }
+        Commands::Exec { cargo_args } => {
+            // No license check for exec - it's called too frequently and would cause delays
+            // License is checked for other cm commands, but not for cargo passthrough
+            let args_refs: Vec<&str> = cargo_args.iter().map(|s| s.as_str()).collect();
+            display::run_cargo_with_display(&args_refs);
+            Ok(())
+        }
         Commands::Strip(args) => strip::handle_strip_command(args),
         Commands::Scat { command } => scat::handle_scat_command(command),
         Commands::Tool { action } => tool::handle_tool(action),
+        Commands::Deps { path, json } => {
+            tokio::task::spawn_blocking(|| -> anyhow::Result<()> {
+                let lm = LicenseManager::new()?;
+                lm.enforce_license("deps")
+            })
+            .await??;
+            cargo_mate::cmd::deps::handle_deps_async(path, json).await
+        }
+        Commands::Liberate { target, out } => {
+            tokio::task::spawn_blocking(move || -> anyhow::Result<()> {
+                let lm = LicenseManager::new()?;
+                lm.enforce_license("liberate")?;
+                liberate::handle_liberate(target, out)
+            })
+            .await??;
+            Ok(())
+        }
+        Commands::Tree { action, target, out, no_folders, no_files, folder_size, file_size, line_count, dates, style, yolo } => {
+            tokio::task::spawn_blocking(move || -> anyhow::Result<()> {
+                let lm = LicenseManager::new()?;
+                lm.enforce_license("tree")?;
+                tree::handle_tree(action, target, out, no_folders, no_files, folder_size, file_size, line_count, dates, style, yolo)
+            })
+            .await??;
+            Ok(())
+        }
+        Commands::Stub { action, target, out, ext, custom, find, skip } => {
+            tokio::task::spawn_blocking(move || -> anyhow::Result<()> {
+                let lm = LicenseManager::new()?;
+                lm.enforce_license("stub")?;
+                stub::handle_stub(action, target, out, ext, custom, find, skip)
+            })
+            .await??;
+            Ok(())
+        }
+        Commands::Bin { action, path, name, out, timeout_seconds, max_depth } => {
+            tokio::task::spawn_blocking(move || -> anyhow::Result<()> {
+                let lm = LicenseManager::new()?;
+                lm.enforce_license("bin")?;
+                bin::handle_bin(action, path, name, out, timeout_seconds, max_depth)
+            })
+            .await??;
+            Ok(())
+        }
     }
 }
 fn handle_default_command() -> Result<()> {
@@ -288,19 +344,20 @@ fn handle_default_command() -> Result<()> {
             name: "default".to_string(),
             dry_run: false,
         };
-        journey::handle_journey(journey_action)
+        return journey::handle_journey(journey_action);
     } else {
         match license_status.as_str() {
             "inactive" => {
-                println!("⚠️  {}", "License is inactive".bright_yellow());
                 help::show_help()?;
-                Ok(())
+                return Ok(());
             }
             _ => {
-                println!("⚠️  {}", "License status unknown".bright_yellow());
                 help::show_help()?;
-                Ok(())
+                return Ok(());
             }
         }
     }
+    activate::handle_install();
+    activate::handle_activate();
+    return Ok(())
 }

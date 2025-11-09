@@ -1,6 +1,6 @@
 [package]
 name = "cargo-mate"
-version = "1.7.6"
+version = "1.8.0"
 authors = ["cyber-boost"]
 description = "Rust development companion that enhances cargo with intelligent workflows, state management, performance optimization, and comprehensive project monitoring."
 edition = "2021"
@@ -23,6 +23,7 @@ exclude = [
     ".cg",
     "src/captain/embedded/",
     "src/captain/sweeping/target/",
+    ".vscode",
 ]
 
 # Build script for embedding binaries
@@ -34,10 +35,6 @@ tempfile = "3.10"
 [[bin]]
 name = "cm"
 path = "src/main.rs"
-
-[[bin]]
-name = "captain"
-path = "src/captain/main.rs"
 
 [lib]
 name = "cargo_mate"

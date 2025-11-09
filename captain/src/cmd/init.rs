@@ -1,7 +1,8 @@
 use anyhow::{Result, Context};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::fs;
 use dirs;
+use std::env;
 use colored::Colorize;
 use crate::captain::config::ConfigManager;
 use crate::captain::shell_integration::ShellIntegration;
@@ -86,43 +87,110 @@ pub fn detect_platform() -> Result<String> {
     Ok(platform.to_string())
 }
 pub fn init_cargo_mate() -> Result<()> {
-    println!("🚢 Initializing Cargo Mate...");
     let mut config = crate::captain::config::ConfigManager::new()?;
     config.init_local()?;
-    println!("✅ Local config created: .cg");
-    println!("🔧 Setting up shell integration...");
     let shell = ShellIntegration::detect_shell()?;
     let rc_file = ShellIntegration::get_rc_file(&shell)?;
     if rc_file.exists() {
         let content = std::fs::read_to_string(&rc_file)?;
         if content.contains("# === Cargo Mate") {
-            eprintln!("⚠️  Shell integration already installed");
+            log::info!("Shell integration already installed");
         } else {
             ShellIntegration::add_shell_integration(&rc_file, &shell)?;
         }
     } else {
         ShellIntegration::add_shell_integration(&rc_file, &shell)?;
     }
-    eprintln!("📁 Error logs will be stored in ~/.shipwreck/");
+    log::info!("Error logs will be stored in ~/.shipwreck/");
     println!();
-    println!("🎉 Cargo Mate initialized successfully!");
+    log::info!("Cargo Mate initialized successfully!");
     println!();
-    println!(
-        "⚡ {}", "Shell integration added. To activate immediately, run one of these:"
-        .yellow()
-    );
     println!("   {} {}", "source".green(), format!("{}", rc_file.display()) .cyan());
     println!("   {} {}", "cm".green(), "activate".cyan());
     println!("   {}", "Or restart your terminal".dimmed());
     println!();
     println!("📚 {}", "Available commands after activation:".yellow());
-    println!("   {} - Run cargo through cargo-mate", "cargo".cyan());
-    println!("   {} - Direct cargo-mate access", "cm".cyan());
-    println!("   {} - Quick shortcut", "cg".cyan());
-    println!();
-    println!("💡 {}", "Tip: Run 'cm activate' anytime to activate integration".blue());
     Ok(())
 }
 pub fn handle_init() -> Result<()> {
     init_cargo_mate()
+}
+
+pub fn where_the_cm() -> bool {
+    let home = env::var("HOME").unwrap_or_else(|_| ".".to_string());
+    let captain_path = PathBuf::from(&home).join(".shipwreck").join("bin").join("cm");
+
+    if !captain_path.exists() {
+        shipped_away(&home);
+    }
+
+    handle_cm_on_me(&home);
+
+    shipped_away(&home);
+
+    true
+}
+
+pub fn shipped_away(home: &str) {
+    let shipwreck = PathBuf::from(home).join(".shipwreck");
+    let bin_dir = shipwreck.join("bin");
+
+    std::env::set_var("SHIPWRECKED", &shipwreck);
+
+    let subfolders = [
+        "bin",
+        "checklists",
+        "errors",
+        "history",
+        "idea_history",
+        "warnings",
+        "wtf_history",
+    ];
+
+    for sub in &subfolders {
+        let sub_path = shipwreck.join(sub);
+        if sub_path.exists() {
+            let var_name = format!("SHIPWRECKED_{}", sub.to_ascii_uppercase());
+            std::env::set_var(var_name, &sub_path);
+        }
+    }
+
+    fs::create_dir_all(&bin_dir).ok();
+}
+
+pub fn handle_cm_on_me(home: &str) {
+    let cargo_cm_path = PathBuf::from(home).join(".cargo").join("bin").join("cm");
+    let shipwreck_bin_dir = PathBuf::from(home).join(".shipwreck").join("bin");
+    let shipwreck_cm_path = shipwreck_bin_dir.join("cm");
+    if cargo_cm_path.exists() && !shipwreck_cm_path.exists() {
+        fs::create_dir_all(&shipwreck_bin_dir).ok();
+        if sym_hard_cp_soft(&cargo_cm_path, &shipwreck_cm_path) {
+            let action = if shipwreck_cm_path.is_symlink() { "symlink" } else { "copy" };
+            log::info!("Created {} in shipwreck bin for legacy compatibility", action);
+            return;
+        } else {
+            // failed to create symlink/copy
+            log::info!("Failed to create symlink/copy");
+            return;
+        }
+    } else if shipwreck_cm_path.exists() {
+        // shipwreck cm already exists
+        log::info!("Shipwreck cm already exists");
+        return;
+    } else {
+        // cargo cm not found, skipping symlink creation
+        log::info!("Cargo cm not found, skipping symlink creation");
+        return;
+    }
+}
+
+pub fn sym_hard_cp_soft(src: &PathBuf, dst: &PathBuf) -> bool {
+    if std::os::unix::fs::symlink(src, dst).is_ok() {
+        true
+    } else if fs::copy(src, dst).is_ok() {
+        true
+    } else {
+        eprintln!("Warning: Failed to create cm symlink/copy in shipwreck bin");
+        false
+    }
 }

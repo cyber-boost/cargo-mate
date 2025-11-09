@@ -24,3 +24,8 @@ pub mod register;
 pub mod test;
 pub mod activate;
 pub mod ddr;
+pub mod deps;
+pub mod liberate;
+pub mod tree;
+pub mod stub;
+pub mod bin;

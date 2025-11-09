@@ -55,6 +55,72 @@ pub enum Commands {
     Scat { #[command(subcommand)] command: crate::scat::ScatCommand },
     Tool { #[command(subcommand)] action: ToolAction },
     Ddr { #[command(subcommand)] action: DockDockRustCommands },
+    Deps {
+        #[arg(long)]
+        path: Option<PathBuf>,
+        #[arg(long)]
+        json: bool,
+    },
+    Liberate {
+        #[arg(short = 't', long, default_value = ".")]
+        target: PathBuf,
+        #[arg(short = 'o', long)]
+        out: Option<PathBuf>,
+    },
+    Tree {
+        #[command(subcommand)]
+        action: Option<TreeAction>,
+        #[arg(short = 't', long, default_value = ".")]
+        target: PathBuf,
+        #[arg(short = 'o', long)]
+        out: Option<PathBuf>,
+        #[arg(long)]
+        no_folders: bool,
+        #[arg(long)]
+        no_files: bool,
+        #[arg(long)]
+        folder_size: bool,
+        #[arg(long)]
+        file_size: bool,
+        #[arg(long)]
+        line_count: bool,
+        #[arg(long)]
+        dates: bool,
+        #[arg(long, default_value = "readme")]
+        style: String,
+        #[arg(long)]
+        yolo: bool,
+    },
+    Stub {
+        #[command(subcommand)]
+        action: Option<StubAction>,
+        #[arg(short = 't', long, default_value = ".")]
+        target: PathBuf,
+        #[arg(short = 'o', long)]
+        out: Option<PathBuf>,
+        #[arg(long)]
+        ext: Option<String>,
+        #[arg(long)]
+        custom: Option<String>,
+        #[arg(long)]
+        find: Option<String>,
+        #[arg(long)]
+        skip: Option<String>,
+    },
+    Bin {
+        #[command(subcommand)]
+        action: Option<BinAction>,
+        #[arg(short, long)]
+        path: Option<PathBuf>,
+        #[arg(short = 'n', long)]
+        name: Option<String>,
+        #[arg(short = 'o', long)]
+        out: Option<PathBuf>,
+        #[arg(long, default_value = "10")]
+        timeout_seconds: u64,
+        #[arg(long)]
+        max_depth: Option<usize>,
+    },
 }
 impl Commands {
     pub fn name(&self) -> &'static str {
@@ -88,6 +154,11 @@ impl Commands {
             Commands::Sweep { action: _ } => "sweep",
             Commands::Tool { .. } => "tool",
             Commands::Ddr { .. } => "ddr",
+            Commands::Deps { .. } => "deps",
+            Commands::Liberate { .. } => "liberate",
+            Commands::Tree { .. } => "tree",
+            Commands::Stub { .. } => "stub",
+            Commands::Bin { .. } => "bin",
         }
     }
 }
@@ -288,4 +359,25 @@ pub enum DockDockRustCommands {
         #[arg(short, long)]
         verbose: bool,
     },
+}
+#[derive(Subcommand, Debug, Clone)]
+pub enum TreeAction {
+    History,
+    Show { name: String },
+    Find { query: String },
+}
+#[derive(Subcommand, Debug, Clone)]
+pub enum StubAction {
+    Find { pattern: Option<String> },
+    Skip { patterns: String },
+    History,
+    Show { name: String },
+    Delete { #[arg(long)] all: bool },
+}
+#[derive(Subcommand, Debug, Clone)]
+pub enum BinAction {
+    History,
+    Show { name: String },
+    Find { query: String },
+    Delete { #[arg(long)] all: bool },
 }

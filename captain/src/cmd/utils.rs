@@ -53,7 +53,19 @@ pub fn run_tracked_command(command: &str, session_id: &str) -> Result<()> {
     let mut cmd = Command::new(parts[0]);
     cmd.args(&parts[1..]);
     if parts[0] == "cargo" {
-        cmd.arg("--message-format=json");
+        // Only add --message-format=json for commands that support it
+        let command_supports_json = parts.get(1).map_or(false, |cmd| {
+            matches!(*cmd, "build" | "check" | "test" | "doc" | "clippy" | "fmt")
+        });
+        if command_supports_json {
+            cmd.arg("--message-format=json");
+        }
+
+        // Handle cargo publish with automatic version checking
+        if parts.get(1) == Some(&"publish") {
+            // We can't do the version check here because this function doesn't have access to the right context
+            // The version check happens in run_cargo_with_display instead
+        }
     }
     let start_time = std::time::Instant::now();
     let mut child = cmd

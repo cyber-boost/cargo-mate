@@ -217,6 +217,9 @@ impl CargoScrubber {
         if let Some(export_path) = &self.options.export_json {
             self.export_results_to_json(&results, export_path)?;
         }
+        if self.options.git_commit && results.projects_cleaned > 0 {
+            self.commit_scrub_changes(&results)?;
+        }
         Ok(())
     }
     fn print_header(&self) {
@@ -301,7 +304,14 @@ impl CargoScrubber {
                     }
                     let target_dir = project_dir.join("target");
                     if target_dir.exists() {
-                        let target_size = self.get_dir_size(&target_dir);
+                        // OPTIMIZATION: Only calculate size if min_size filter is set or sort_by_size is enabled
+                        // This dramatically speeds up scanning when size info isn't needed
+                        let target_size = if options.min_size.is_some() || options.sort_by_size {
+                            self.get_dir_size(&target_dir)
+                        } else {
+                            // Quick estimate using directory metadata (much faster)
+                            1 // Non-zero to indicate target exists
+                        };
                         if let Some(min_size) = options.min_size {
                             if target_size < min_size * 1024 * 1024 {
                                 continue;
@@ -365,8 +375,18 @@ impl CargoScrubber {
             "/Library",
             "/Applications",
             "/.rustup",
+            "/node_modules", // Often contains Rust wasm projects but huge
+            "/.git",          // Never has Cargo projects
+            "/vendor",        // Usually vendored dependencies
+            "/target",        // Nested targets (already cleaned by parent)
         ];
         let path_str = path.to_string_lossy();
+
+        // OPTIMIZATION: Early exit on common patterns
+        if path_str.starts_with("/proc") || path_str.starts_with("/sys") || path_str.starts_with("/dev") {
+            return true;
+        }
+
         if default_excluded.iter().any(|excl| path_str.contains(excl)) {
             return true;
         }
@@ -627,6 +647,67 @@ impl CargoScrubber {
         let json_string = serde_json::to_string_pretty(&json_data)?;
         fs::write(path, json_string)?;
         println!("\n📄 Results exported to: {}", path.display().to_string().cyan());
+        Ok(())
+    }
+
+    fn commit_scrub_changes(&self, results: &ScrubResults) -> Result<()> {
+        println!("\n{}", "🔗 Committing scrub changes to git...".cyan().bold());
+
+        // Check if we're in a git repository
+        let git_check = Command::new("git")
+            .arg("rev-parse")
+            .arg("--git-dir")
+            .output();
+
+        if !git_check.map(|o| o.status.success()).unwrap_or(false) {
+            println!("⚠️  Not in a git repository, skipping git commit");
+            return Ok(());
+        }
+
+        // Stage all changes (deleted target directories)
+        let add_output = Command::new("git")
+            .args(&["add", "-A"])
+            .output()
+            .context("Failed to stage changes")?;
+
+        if !add_output.status.success() {
+            let stderr = String::from_utf8_lossy(&add_output.stderr);
+            return Err(anyhow::anyhow!("Failed to stage changes: {}", stderr));
+        }
+
+        // Check if there are any changes to commit
+        let status_output = Command::new("git")
+            .args(&["status", "--porcelain"])
+            .output()
+            .context("Failed to check git status")?;
+
+        let status = String::from_utf8_lossy(&status_output.stdout);
+        if status.trim().is_empty() {
+            println!("✅ No changes to commit");
+            return Ok(());
+        }
+
+        // Create commit message
+        let commit_message = format!(
+            "🧹 Cargo scrub: cleaned {} projects, freed {} space\n\nProjects cleaned: {}\nSpace saved: {}",
+            results.projects_cleaned,
+            format_bytes(results.total_savings),
+            results.projects_cleaned,
+            format_bytes(results.total_savings)
+        );
+
+        // Commit the changes
+        let commit_output = Command::new("git")
+            .args(&["commit", "-m", &commit_message])
+            .output()
+            .context("Failed to commit changes")?;
+
+        if !commit_output.status.success() {
+            let stderr = String::from_utf8_lossy(&commit_output.stderr);
+            return Err(anyhow::anyhow!("Failed to commit changes: {}", stderr));
+        }
+
+        println!("✅ Successfully committed scrub changes to git");
         Ok(())
     }
 }

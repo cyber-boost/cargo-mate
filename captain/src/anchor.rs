@@ -10,7 +10,7 @@ use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::mpsc::channel;
-use crate::captain::license;
+use crate::captain::{license, config::ConfigManager};
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Anchor {
     pub name: String,
@@ -53,7 +53,16 @@ impl AnchorManager {
     }
     pub fn save(&self, name: &str, description: &str) -> Result<()> {
         println!("⚓ Dropping anchor: {}", name.cyan().bold());
-        let git_commit = None;
+        let config = ConfigManager::new()?;
+        let auto_anchor_git = config.get("version_control.auto_anchor_git")
+            .unwrap_or_else(|| "true".to_string())
+            .parse()
+            .unwrap_or(true);
+        let git_commit = if auto_anchor_git {
+            self.get_current_git_commit().ok()
+        } else {
+            None
+        };
         let cargo_lock_hash = self.hash_cargo_lock()?;
         let files_snapshot = self.create_files_snapshot()?;
         let environment = self.capture_environment();
@@ -354,6 +363,19 @@ impl AnchorManager {
         let anchor: Anchor = serde_json::from_str(&content)?;
         Ok(anchor)
     }
+    fn get_current_git_commit(&self) -> Result<String> {
+        let output = Command::new("git")
+            .args(&["rev-parse", "HEAD"])
+            .output()?;
+        if !output.status.success() {
+            return Err(anyhow::anyhow!(
+                "Failed to get current git commit: {}",
+                String::from_utf8_lossy(&output.stderr)
+            ));
+        }
+        Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
+    }
+
     fn checkout_git_commit(&self, commit: &str) -> Result<()> {
         let output = Command::new("git").args(&["checkout", commit]).output()?;
         if !output.status.success() {

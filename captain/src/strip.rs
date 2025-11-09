@@ -58,6 +58,8 @@ pub struct StripArgs {
     pub strip_docs: bool,
     #[arg(long)]
     pub inline_uses: bool,
+    #[arg(short = 'v', long)]
+    pub verbose: bool,
 }
 pub fn handle_strip_command(args: StripArgs) -> Result<()> {
     show_active_options(&args);
@@ -67,6 +69,18 @@ pub fn handle_strip_command(args: StripArgs) -> Result<()> {
             anyhow::anyhow!("Input path does not exist: {}", input_path.display()),
         );
     }
+    // SAFETY: Validate that we're only processing Rust files
+    // This prevents accidental processing of Cargo.toml, .json, or other files
+    if !input_path.is_dir() {
+        validate_rust_file(&input_path)?;
+    }
+
+    // Extra safety check: warn about critical files in directory
+    if input_path.is_dir() {
+        println!("⚠️  Processing directory: {}", input_path.display());
+        println!("   Only .rs files will be processed, all other files are skipped");
+    }
+
     let backup_dir = create_backup_directory()?;
     if args.recursive || input_path.is_dir() {
         process_directory(&input_path, &args, &backup_dir)?;
@@ -126,6 +140,18 @@ fn determine_input_path(args: &StripArgs) -> Result<PathBuf> {
         Ok(args.input.clone())
     }
 }
+fn validate_rust_file(path: &PathBuf) -> Result<()> {
+    let extension = path.extension().and_then(|s| s.to_str());
+    if extension != Some("rs") {
+        return Err(anyhow::anyhow!(
+            "❌ Can only strip Rust (.rs) files. Got: {:?}\n   File: {}",
+            extension.unwrap_or("no extension"),
+            path.display()
+        ));
+    }
+    Ok(())
+}
+
 fn create_backup_directory() -> Result<PathBuf> {
     let home = std::env::var("HOME").unwrap_or_else(|_| ".".to_string());
     let backup_dir = PathBuf::from(home).join(".shipwreck").join("strip");
@@ -429,6 +455,19 @@ fn process_directory(
     for entry in walker {
         let path = entry.path();
         let extension = path.extension().and_then(|s| s.to_str());
+
+        // SAFETY: Explicitly check for and skip important project files
+        if let Some(file_name) = path.file_name().and_then(|n| n.to_str()) {
+            if file_name == "Cargo.toml" || file_name == "Cargo.lock"
+                || file_name.ends_with(".json") || file_name.ends_with(".toml") {
+                if args.verbose {
+                    println!("⏭️  Skipping protected file: {}", path.display());
+                }
+                skipped_count += 1;
+                continue;
+            }
+        }
+
         if extension == Some("rs") {
             let output_path = if let Some(ref output_base) = output_base {
                 let relative = path.strip_prefix(dir).unwrap_or(path);
@@ -457,6 +496,9 @@ fn process_directory(
         } else if path.is_dir() {
             continue;
         } else {
+            if args.verbose {
+                println!("⏭️  Skipping non-Rust file: {}", path.display());
+            }
             skipped_count += 1;
         }
     }
@@ -502,6 +544,7 @@ fn main() {
             strip_attrs: false,
             strip_docs: false,
             inline_uses: false,
+            verbose: false,
         };
         let result = strip_rust(source, &args).unwrap();
         assert!(! result.contains("//"));
@@ -533,6 +576,7 @@ fn main() {
             strip_attrs: false,
             strip_docs: false,
             inline_uses: false,
+            verbose: false,
         };
         let result = strip_rust(source, &args).unwrap();
         let lines: Vec<&str> = result.lines().collect();
@@ -566,6 +610,7 @@ fn main() {
             strip_attrs: false,
             strip_docs: false,
             inline_uses: false,
+            verbose: false,
         };
         let result = strip_rust(source, &args).unwrap();
         assert!(! result.contains("///"));
@@ -590,6 +635,7 @@ fn main() {
             strip_attrs: false,
             strip_docs: false,
             inline_uses: false,
+            verbose: false,
         };
         assert_eq!(determine_input_path(& args).unwrap(), PathBuf::from("test.rs"));
         args.src = true;

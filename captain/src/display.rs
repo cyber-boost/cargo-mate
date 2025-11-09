@@ -372,12 +372,41 @@ const BUILD_STAGES: &[&str] = &[
 ];
 pub fn run_cargo_with_display(args: &[&str]) {
     let start_time = Instant::now();
+    
+    // ONLY use wrapper for 'build' command - all other commands run directly
+    // This prevents issues with --message-format=json and other wrapper interference
+    let cmd_name = args.get(0).map(|s| *s).unwrap_or("");
+    let needs_wrapper = cmd_name == "build";
+    
+    if !needs_wrapper {
+        // For ALL commands other than build (check, test, doc, clippy, fmt, bench, run, publish, install, etc.)
+        // Run directly without any wrapper interference
+        // No license checks, no JSON parsing, no delays - just pure cargo passthrough
+        let mut command = Command::new("cargo");
+        command.args(args);
+        // Inherit stdin/stdout/stderr for interactive commands
+        let status = command.status().unwrap_or_else(|e| {
+            eprintln!("Failed to start cargo: {}", e);
+            std::process::exit(1);
+        });
+        std::process::exit(status.code().unwrap_or(1));
+    }
+    
     let mut error_deduplicator = ErrorDeduplicator::new();
     let error_prioritizer = ErrorPrioritizer::new();
     let mut build_coach = BuildCoach::new();
-    let mut child = Command::new("cargo")
-        .args(args)
-        .arg("--message-format=json")
+
+    // Only 'build' command uses the wrapper, so we can safely add JSON format
+    // All other commands have already been handled above with direct passthrough
+    let mut command = Command::new("cargo");
+    command.args(args);
+    
+    // Add JSON format for build command (it's the only one that reaches here)
+    if !args.iter().any(|arg| matches!(*arg, "--help" | "-h" | "help")) {
+        command.arg("--message-format=json");
+    }
+
+    let mut child = command
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
@@ -396,6 +425,13 @@ pub fn run_cargo_with_display(args: &[&str]) {
     let error_count = Arc::new(AtomicUsize::new(0));
     let warning_count = Arc::new(AtomicUsize::new(0));
     let artifact_count = Arc::new(AtomicUsize::new(0));
+    // Show initial animation message (like it used to)
+    if let Some(message) = NAUTICAL_MESSAGES.get(0) {
+        println!("{}", message.cyan());
+    }
+    
+    // Only show progress bars if we're actually processing JSON output
+    // For commands with immediate output, progress bars can be distracting
     let multi_progress = MultiProgress::new();
     let main_pb = create_main_progress_bar();
     let main_pb = multi_progress.add(main_pb);
@@ -403,19 +439,26 @@ pub fn run_cargo_with_display(args: &[&str]) {
     let status_pb = multi_progress.add(status_pb);
     let file_pb = create_file_counter_bar();
     let file_pb = multi_progress.add(file_pb);
-    main_pb.set_message(format!("🚢 Starting cargo {}", args.join(" ")));
+    
+    main_pb.set_message(format!("🚢 {}", args.join(" ")));
     status_pb.set_message("⏳ Initializing...");
     file_pb.set_message("📁 0 files processed");
     let mut message_index = 0;
     let mut stage_index = 0;
     let mut tick_count = 0;
     let mut last_stage_change = Instant::now();
+    let mut last_output = Instant::now();
+    let mut has_output = false;
+    
     if !NAUTICAL_MESSAGES.is_empty() && message_index >= NAUTICAL_MESSAGES.len() {
         message_index = 0;
     }
     if !BUILD_STAGES.is_empty() && stage_index >= BUILD_STAGES.len() {
         stage_index = 0;
     }
+    
+    // Don't show initial animation - output will come soon enough
+    
     let err_handle = thread::spawn(move || {
         let reader = BufReader::new(err_reader);
         for line in reader.lines() {
@@ -424,8 +467,19 @@ pub fn run_cargo_with_display(args: &[&str]) {
             }
         }
     });
+    
+    // Process output line by line, showing it immediately
     for line in reader.lines() {
         if let Ok(line) = line {
+            // Show output immediately for non-JSON lines (fallback output)
+            // This ensures users see output right away, especially for commands like run
+            if !line.trim_start().starts_with('{') {
+                println!("{}", line);
+                has_output = true;
+                last_output = Instant::now();
+                continue; // Skip JSON parsing for non-JSON lines
+            }
+            
             if let Some(msg) = parser::parse_cargo_message(&line) {
                 match msg.data {
                     MessageData::CompilerMessage(cm) => {
@@ -434,6 +488,14 @@ pub fn run_cargo_with_display(args: &[&str]) {
                                 let parsed_error = parser::format_error(&cm.message);
                                 errors.push(parsed_error.clone());
                                 error_count.store(errors.len(), Ordering::Relaxed);
+                                
+                                // Show shortened error output immediately
+                                if errors.len() <= 3 {
+                                    println!("🔴 {}", parsed_error);
+                                } else if errors.len() == 4 {
+                                    println!("🔴 ... and more errors");
+                                }
+                                
                                 status_pb
                                     .set_message(
                                         format!(
@@ -450,6 +512,14 @@ pub fn run_cargo_with_display(args: &[&str]) {
                                 let parsed_warning = parser::format_warning(&cm.message);
                                 warnings.push(parsed_warning.clone());
                                 warning_count.store(warnings.len(), Ordering::Relaxed);
+                                
+                                // Show shortened warning output immediately (only first few)
+                                if warnings.len() <= 3 {
+                                    println!("⚠️  {}", parsed_warning);
+                                } else if warnings.len() == 4 {
+                                    println!("⚠️  ... and more warnings");
+                                }
+                                
                                 status_pb
                                     .set_message(
                                         format!(
@@ -480,6 +550,12 @@ pub fn run_cargo_with_display(args: &[&str]) {
                     MessageData::CompilerArtifact(ca) => {
                         artifacts.push(ca);
                         artifact_count.store(artifacts.len(), Ordering::Relaxed);
+                        
+                        // Show shortened artifact output (only first few)
+                        if artifacts.len() <= 3 {
+                            println!("📦 Compiled: {}", ca.target.name);
+                        }
+                        
                         file_pb
                             .set_message(
                                 format!(
@@ -491,49 +567,48 @@ pub fn run_cargo_with_display(args: &[&str]) {
                     _ => {}
                 }
                 tick_count += 1;
-                if tick_count > 1_000_000 {
-                    tick_count = 0;
+                has_output = true;
+                last_output = Instant::now();
+                
+                // Update progress bars less frequently to avoid interfering with output
+                // Only tick progress bars, don't update messages if we have recent output
+                if last_output.elapsed() > Duration::from_millis(1000) {
+                    // No recent output, safe to update animations
+                    if tick_count > 1_000_000 {
+                        tick_count = 0;
+                    }
+                    if tick_count % 20 == 0 && !NAUTICAL_MESSAGES.is_empty() {
+                        message_index = (message_index + 1) % NAUTICAL_MESSAGES.len();
+                        if let Some(message) = NAUTICAL_MESSAGES.get(message_index) {
+                            main_pb.set_prefix(message.to_string());
+                        }
+                    }
+                    if last_stage_change.elapsed() > Duration::from_secs(5)
+                        && !BUILD_STAGES.is_empty()
+                    {
+                        stage_index = (stage_index + 1) % BUILD_STAGES.len();
+                        if let Some(stage) = BUILD_STAGES.get(stage_index) {
+                            status_pb.set_message(stage.to_string());
+                        }
+                        last_stage_change = Instant::now();
+                    }
                 }
-                if tick_count % 3 == 0 && !NAUTICAL_MESSAGES.is_empty() {
-                    message_index = (message_index + 1) % NAUTICAL_MESSAGES.len();
-                    if message_index >= NAUTICAL_MESSAGES.len() {
-                        message_index = 0;
-                    }
-                    if let Some(message) = NAUTICAL_MESSAGES.get(message_index) {
-                        main_pb.set_prefix(message.to_string());
-                    }
+                // Always tick progress bars, but less frequently
+                if tick_count % 5 == 0 {
+                    main_pb.tick();
+                    status_pb.tick();
+                    file_pb.tick();
                 }
-                if last_stage_change.elapsed() > Duration::from_secs(2)
-                    && !BUILD_STAGES.is_empty()
-                {
-                    stage_index = (stage_index + 1) % BUILD_STAGES.len();
-                    if stage_index >= BUILD_STAGES.len() {
-                        stage_index = 0;
-                    }
-                    if let Some(stage) = BUILD_STAGES.get(stage_index) {
-                        status_pb.set_message(stage.to_string());
-                    }
-                    last_stage_change = Instant::now();
-                }
-                main_pb.tick();
-                status_pb.tick();
-                file_pb.tick();
             }
         }
     }
     let elapsed = start_time.elapsed();
-    main_pb
-        .finish_with_message(
-            format!(
-                "🚢 Cargo {} completed in {:.1}s", args.join(" "), elapsed
-                .as_secs_f32()
-            ),
-        );
-    status_pb.finish_with_message("✅ Build finished");
-    file_pb
-        .finish_with_message(
-            format!("📁 {} files processed", artifact_count.load(Ordering::Relaxed)),
-        );
+    
+    // Finish progress bars before showing summary (clear them)
+    main_pb.finish();
+    status_pb.finish();
+    file_pb.finish();
+    
     let _ = err_handle.join();
     let status = child.wait().unwrap();
     let has_recurring_errors = !errors.is_empty()
@@ -544,11 +619,7 @@ pub fn run_cargo_with_display(args: &[&str]) {
         error_count: errors.len(),
         has_recurring_errors,
     };
-    if let Some(tip) = build_coach.check_and_show_tip(&build_context) {
-        println!("\n{}", tip.cyan());
-    }
-    save_results(&errors, &warnings, &artifacts, &build_scripts, args);
-    record_build_metrics(args, elapsed, errors.len(), warnings.len(), status.success());
+    // Show summary first (like it used to)
     display_summary(
         &errors,
         &warnings,
@@ -557,10 +628,23 @@ pub fn run_cargo_with_display(args: &[&str]) {
         status.success(),
         elapsed,
     );
+    
+    // Then show helpful tips and suggestions
+    if let Some(tip) = build_coach.check_and_show_tip(&build_context) {
+        println!("\n{}", tip.cyan());
+    }
+    
+    // Show error patterns if there are errors
     if !errors.is_empty() {
         let prioritized_errors = error_prioritizer.sort_errors(errors.clone());
         process_and_display_errors(&prioritized_errors);
     }
+    
+    // Save results and record metrics
+    save_results(&errors, &warnings, &artifacts, &build_scripts, args);
+    record_build_metrics(args, elapsed, errors.len(), warnings.len(), status.success());
+    
+    // Show checklist and view options at the end
     if !errors.is_empty() || !warnings.is_empty() {
         checklist::generate_checklist(&errors, &warnings);
         println!("\n📋 Run {} to see your checklist", "cm checklist".yellow());
@@ -659,6 +743,7 @@ fn display_summary(
     println!("🔨 Build scripts: {}", build_scripts.len());
     if !errors.is_empty() {
         println!("\n{}", format!("🔴 {} Error(s):", errors.len()) .red().bold());
+        // Show shortened error list (top 3)
         for (i, error) in errors.iter().take(3).enumerate() {
             println!("  {}. {}", i + 1, error);
         }
@@ -670,6 +755,7 @@ fn display_summary(
         println!(
             "\n{}", format!("⚠️  {} Warning(s):", warnings.len()) .yellow().bold()
         );
+        // Show shortened warning list (top 3)
         for (i, warning) in warnings.iter().take(3).enumerate() {
             println!("  {}. {}", i + 1, warning);
         }
@@ -831,4 +917,119 @@ pub fn check_first_mate_monitor(command: &str) -> Result<bool, anyhow::Error> {
             Ok(false)
         }
     }
+}
+
+fn handle_publish_version_check() -> Result<(), anyhow::Error> {
+    println!("📦 Checking crates.io for latest version before publish...");
+
+    // Read current package info from Cargo.toml
+    let cargo_toml = fs::read_to_string("Cargo.toml")
+        .context("Failed to read Cargo.toml")?;
+
+    let package_name = extract_package_name(&cargo_toml)?;
+    let current_version = extract_package_version(&cargo_toml)?;
+
+    println!("   📦 Package: {}", package_name.cyan());
+    println!("   📦 Current version: {}", current_version.cyan());
+
+    // Query crates.io API for latest version
+    let client = reqwest::blocking::Client::new();
+    let api_url = format!("https://crates.io/api/v1/crates/{}", package_name);
+
+    let response = client
+        .get(&api_url)
+        .send()
+        .context("Failed to query crates.io API")?;
+
+    if !response.status().is_success() {
+        if response.status() == 404 {
+            println!("   🆕 New package - no existing versions on crates.io");
+            return Ok(());
+        }
+        return Err(anyhow::anyhow!("Crates.io API returned status: {}", response.status()));
+    }
+
+    let api_response: serde_json::Value = response.json()
+        .context("Failed to parse crates.io API response")?;
+
+    if let Some(latest_version) = api_response
+        .get("crate")
+        .and_then(|c| c.get("max_version"))
+        .and_then(|v| v.as_str())
+    {
+        println!("   📦 Latest published version: {}", latest_version.green());
+
+        if latest_version == current_version {
+            println!("   🔄 Version matches published version - incrementing...");
+            let new_version = increment_version(&current_version)?;
+            println!("   📦 New version: {} -> {}", current_version.yellow(), new_version.green());
+
+            update_cargo_toml_version(&cargo_toml, &current_version, &new_version)?;
+            println!("   ✅ Cargo.toml updated with new version");
+        } else {
+            println!("   ✅ Version is newer than published version - proceeding with publish");
+        }
+    } else {
+        println!("   ⚠️  Could not determine latest published version");
+    }
+
+    Ok(())
+}
+
+fn extract_package_name(cargo_toml: &str) -> Result<String, anyhow::Error> {
+    for line in cargo_toml.lines() {
+        if line.trim().starts_with("name = ") {
+            let name = line
+                .split('"')
+                .nth(1)
+                .ok_or_else(|| anyhow::anyhow!("Cannot parse package name from Cargo.toml"))?;
+            return Ok(name.to_string());
+        }
+    }
+    Err(anyhow::anyhow!("Package name not found in Cargo.toml"))
+}
+
+fn extract_package_version(cargo_toml: &str) -> Result<String, anyhow::Error> {
+    for line in cargo_toml.lines() {
+        if line.trim().starts_with("version = ") {
+            let version = line
+                .split('"')
+                .nth(1)
+                .ok_or_else(|| anyhow::anyhow!("Cannot parse version from Cargo.toml"))?;
+            return Ok(version.to_string());
+        }
+    }
+    Err(anyhow::anyhow!("Version not found in Cargo.toml"))
+}
+
+fn increment_version(version: &str) -> Result<String, anyhow::Error> {
+    let parts: Vec<&str> = version.split('.').collect();
+    if parts.len() != 3 {
+        return Err(anyhow::anyhow!("Invalid version format: {}", version));
+    }
+
+    let major: u32 = parts[0].parse()?;
+    let minor: u32 = parts[1].parse()?;
+    let patch: u32 = parts[2].parse()?;
+
+    // Increment patch version, rolling over to minor if patch is 9
+    let (new_minor, new_patch) = if patch == 9 {
+        (minor + 1, 0)
+    } else {
+        (minor, patch + 1)
+    };
+
+    Ok(format!("{}.{}.{}", major, new_minor, new_patch))
+}
+
+fn update_cargo_toml_version(cargo_toml: &str, old_version: &str, new_version: &str) -> Result<(), anyhow::Error> {
+    let new_content = cargo_toml.replace(
+        &format!("version = \"{}\"", old_version),
+        &format!("version = \"{}\"", new_version)
+    );
+
+    fs::write("Cargo.toml", new_content)
+        .context("Failed to update Cargo.toml with new version")?;
+
+    Ok(())
 }

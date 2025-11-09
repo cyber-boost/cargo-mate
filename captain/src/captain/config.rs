@@ -13,6 +13,7 @@ pub struct ProjectConfig {
     pub auto_fix: AutoFixSettings,
     pub journey: JourneySettings,
     pub build: BuildSettings,
+    pub version_control: VersionControlSettings,
     pub hooks: HookSettings,
 }
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -52,6 +53,12 @@ pub struct HookSettings {
     pub post_build: Vec<String>,
     pub on_error: Vec<String>,
     pub on_success: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct VersionControlSettings {
+    pub auto_git_commit: bool,
+    pub auto_anchor_git: bool,
 }
 pub struct ConfigManager {
     global_config: ProjectConfig,
@@ -395,6 +402,10 @@ impl Default for ProjectConfig {
                 target_dir: None,
                 incremental: true,
                 cache_artifacts: true,
+            },
+            version_control: VersionControlSettings {
+                auto_git_commit: true,
+                auto_anchor_git: true,
             },
             hooks: HookSettings {
                 pre_build: Vec::new(),
